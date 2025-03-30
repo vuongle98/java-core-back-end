@@ -34,6 +34,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 
+	implementation 'org.springframework.boot:spring-boot-starter-cache'
+
 
 	implementation 'org.modelmapper:modelmapper:3.2.0'
 	implementation 'org.reflections:reflections:0.10.2'

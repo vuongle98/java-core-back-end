@@ -6,7 +6,9 @@ import com.vuog.core.module.rest.domain.repository.GenericRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ConfigurationRepositoryImpl extends GenericRepository<Configuration, Long>, ConfigurationRepository {
+public interface ConfigurationRepositoryImpl extends
+        GenericRepository<Configuration, Long>,
+        ConfigurationRepository {
 
     default Class<Configuration> getEntityClass() {
         return Configuration.class;

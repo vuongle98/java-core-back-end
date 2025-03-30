@@ -1,4 +1,5 @@
-package com.vuog.core.module.configuration.domain.model;
+package com.vuog.core.module.logging.domain.model;
+
 
 import com.vuog.core.common.base.BaseModel;
 import com.vuog.core.module.auth.domain.model.User;
@@ -11,22 +12,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.net.InetAddress;
 
 @Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "rate_limiting")
-public class RateLimiting extends BaseModel {
+@Table(name = "user_request_logs")
+public class UserRequestLog extends BaseModel {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
-    private String apiEndpoint;
+    private InetAddress ipAddress;
 
-    private long requestCount;
-
-    private LocalDateTime resetTime;
 }
