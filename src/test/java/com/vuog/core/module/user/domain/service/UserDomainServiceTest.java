@@ -1,7 +1,8 @@
 package com.vuog.core.module.user.domain.service;
 
-import com.vuog.core.module.user.domain.model.User;
-import com.vuog.core.module.user.domain.repository.UserRepository;
+import com.vuog.core.module.auth.domain.model.User;
+import com.vuog.core.module.auth.domain.repository.UserRepository;
+import com.vuog.core.module.auth.domain.service.UserDomainService;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;

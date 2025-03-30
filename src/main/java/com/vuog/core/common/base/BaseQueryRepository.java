@@ -16,6 +16,8 @@ public interface BaseQueryRepository<T> {
 
     List<T> findAll(Specification<T> spec);
 
+    List<T> findAll();
+
     Page<T> findAll(Specification<T> spec, Pageable pageable);
 
     long count(Specification<T> spec);

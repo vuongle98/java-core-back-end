@@ -1,7 +1,7 @@
 package com.vuog.core.module.configuration.domain.model;
 
 import com.vuog.core.common.base.BaseModel;
-import com.vuog.core.module.user.domain.model.User;
+import com.vuog.core.module.auth.domain.model.User;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;

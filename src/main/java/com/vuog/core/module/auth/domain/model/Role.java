@@ -4,6 +4,7 @@ import com.vuog.core.common.base.BaseModel;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
 import java.util.Set;
 
 
@@ -25,7 +26,18 @@ public class Role extends BaseModel {
     @Column(name = "description")
     private String description;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    private Set<Permission> permissions;
+    @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
+    private Set<User> users = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    private Set<Permission> permissions = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "roles_hierarchy",
+            joinColumns = @JoinColumn(name = "parent_role_id"),
+            inverseJoinColumns = @JoinColumn(name = "child_role_id")
+    )
+    private Set<Role> childRoles = new HashSet<>(); // Các role con
 
 }

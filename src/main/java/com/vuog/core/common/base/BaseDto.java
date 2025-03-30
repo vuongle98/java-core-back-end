@@ -4,18 +4,19 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class BaseDto {
+public abstract class BaseDto implements Serializable {
 
-    private Long id;
+    protected Long id;
 
-    private String createdBy;
-    private String updatedBy;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+//    protected String createdBy;
+//    protected String updatedBy;
+//    protected LocalDateTime createdAt;
+//    protected LocalDateTime updatedAt;
 }
