@@ -26,30 +26,39 @@ public class JwtUtils {
     private String jwtSecret;
 
     @Value("${app.jwt.expiration.ms}")
-    private int jwtExpirationMs;
+    private Long jwtExpirationMs;
 
-    public String generateJwtToken(Authentication authentication) {
+    @Value("${app.jwt.refersh.expiration.ms}")
+    private Long jwtRefreshExpirationMs;
+
+    public String generateJwtToken(Map<String, Object> extraClaims, Authentication authentication) {
 
         User user = (User) authentication.getPrincipal();
 
-        return generateToken(new HashMap<>(), user);
+        return generateToken(extraClaims, user, jwtExpirationMs);
+    }
+
+    public String generateRefreshToken(Map<String, Object> extraClaims, Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+
+        return generateToken(extraClaims, user, jwtRefreshExpirationMs);
     }
 
     public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+        return generateToken(new HashMap<>(), userDetails, jwtExpirationMs);
     }
 
     public String generateToken(String username) {
         return generateToken(new HashMap<>(), username);
     }
 
-    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails, long expiration) {
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(key(), SignatureAlgorithm.HS256)
                 .compact();
     }

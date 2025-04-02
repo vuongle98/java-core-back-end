@@ -32,6 +32,9 @@ public class Token extends BaseModel {
     @Column(name = "is_black_listed")
     private Boolean isBlacklisted;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Token relatedToken;
+
     public enum TokenType {
         ACCESS, REFRESH
     }

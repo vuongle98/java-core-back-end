@@ -23,10 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @Transactional
@@ -34,6 +31,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Value("${app.jwt.expiration.ms}")
     private Long tokenExpireTime;
+
+    @Value("${app.jwt.refersh.expiration.ms}")
+    private Long refreshTokenExpireTime;
 
     private final UserRepository userRepository;
 
@@ -63,29 +63,94 @@ public class AuthServiceImpl implements AuthService {
         User user = (User) authentication.getPrincipal();
 
         // find existed token by user before generate new
-        Optional<Token> tokenOptional = tokenService.findByUser(user);
+        Optional<Token> accessTokenOptional = tokenService.findByUserAndType(user, Token.TokenType.ACCESS);
+        Optional<Token> refreshTokenOptional = tokenService.findByUserAndType(user, Token.TokenType.REFRESH);
 
-        if (tokenOptional.isPresent()) {
-            Token token = tokenOptional.get();
+        if (accessTokenOptional.isPresent()) {
+            Token token = accessTokenOptional.get();
+
+            String refreshToken;
+            if (refreshTokenOptional.isPresent()) {
+                refreshToken = refreshTokenOptional.get().getToken();
+            } else {
+                refreshToken = jwtUtils.generateRefreshToken(new HashMap<>(), authentication);
+                tokenService.create(
+                        refreshToken,
+                        Token.TokenType.REFRESH,
+                        LocalDateTime.now().plus(refreshTokenExpireTime, ChronoUnit.MILLIS),
+                        user, token);
+            }
+
             return JwtResponseDto
                     .builder()
                     .type("Bearer")
                     .token(token.getToken())
+                    .refresh(refreshToken)
                     .user(new UserDto(user))
                     .build();
         } else {
 
-            String jwt = jwtUtils.generateJwtToken(authentication);
+            String jwt = jwtUtils.generateJwtToken(new HashMap<>(), authentication);
+            String refreshToken = jwtUtils.generateRefreshToken(new HashMap<>(), authentication);
 
-            tokenService.create(jwt, Token.TokenType.ACCESS, LocalDateTime.now().plus(tokenExpireTime, ChronoUnit.MILLIS), user);
+            Token token  = tokenService.create(jwt,
+                    Token.TokenType.ACCESS,
+                    LocalDateTime.now().plus(tokenExpireTime, ChronoUnit.MILLIS),
+                    user, null);
+            tokenService.create(
+                    refreshToken,
+                    Token.TokenType.REFRESH,
+                    LocalDateTime.now().plus(refreshTokenExpireTime, ChronoUnit.MILLIS),
+                    user, token);
 
             return JwtResponseDto
                     .builder()
                     .type("Bearer")
                     .token(jwt)
+                    .refresh(refreshToken)
                     .user(new UserDto(user))
                     .build();
         }
+    }
+
+    @Override
+    public JwtResponseDto refreshToken(String refreshToken) {
+
+        if (refreshToken.startsWith("Bearer ")) {
+            refreshToken = refreshToken.substring(7);
+        }
+
+        String username = jwtUtils.getUserNameFromJwtToken(refreshToken);
+
+        Optional<User> userOptional = userRepository.findByUsername(username);
+
+        if (userOptional.isEmpty()) {
+            throw new UserNotFoundException("User not found: " + username);
+        }
+
+        User user = userOptional.get();
+
+        Optional<Token> refreshTokenDB = tokenService.findValidByTokenAndUser(refreshToken, user);
+
+        if (refreshTokenDB.isEmpty() || !refreshTokenDB.get().getToken().equals(refreshToken)) {
+            throw new UserNotFoundException("Invalid refresh token: " + refreshToken);
+        }
+
+        String newToken = jwtUtils.generateToken(user);
+
+        tokenService.create(newToken,
+                Token.TokenType.ACCESS,
+                LocalDateTime.now().plus(tokenExpireTime, ChronoUnit.MILLIS),
+                user, refreshTokenDB.get());
+
+        return JwtResponseDto
+                .builder()
+                .type("Bearer")
+                .token(newToken)
+                .refresh(refreshToken)
+                .user(new UserDto(user))
+                .build();
+
     }
 
     @Override
@@ -124,7 +189,15 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void logout(String token) {
-        tokenService.blacklist(token);
+    public void logout() {
+
+        // find all token of user
+        User user = Context.getUser();
+
+        List<Token> tokens = tokenService.findAllByUser(user);
+
+        for (Token token : tokens) {
+            tokenService.blacklist(token.getToken());
+        }
     }
 }

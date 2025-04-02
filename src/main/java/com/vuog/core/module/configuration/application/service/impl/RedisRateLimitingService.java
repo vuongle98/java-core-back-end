@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class RedisRateLimitingService implements RateLimitingService {
 
-    private static final Long REQUEST_LIMIT = 1000L;
+    private static final Long REQUEST_LIMIT = 10L;
     private static final Long TIME_WINDOW = 60L;
 
     private final RedisTemplate<String, Integer> redisTemplate;
@@ -19,8 +19,13 @@ public class RedisRateLimitingService implements RateLimitingService {
     }
 
     @Override
-    public boolean isAllowed(Long userId) {
-        String key = "rate_limit:" + userId;
+    public boolean isAllowed(Long userId, String requestIp) {
+        String key;
+        if (userId == null) {
+            key = "rate_limit:ip:" + requestIp; // Nếu không có userId, chỉ limit theo IP
+        } else {
+            key = "rate_limit:ip-user:" + requestIp + ":" + userId; // Nếu có userId, dùng cả IP + userId
+        }
         Integer requestCount = redisTemplate.opsForValue().get(key);
 
         if (requestCount == null) {

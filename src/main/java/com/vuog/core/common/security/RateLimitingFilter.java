@@ -16,7 +16,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 @Component
-public class RateLimitingFilter extends OncePerRequestFilter implements Ordered {
+public class RateLimitingFilter extends OncePerRequestFilter {
 
     private final RateLimitingService rateLimitingService;
     private final UserRepository userRepository;
@@ -30,22 +30,23 @@ public class RateLimitingFilter extends OncePerRequestFilter implements Ordered 
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
+        String userIp = request.getRemoteAddr();
+
         if (auth != null && auth.isAuthenticated()) {
             String username = auth.getName();
             User user = userRepository.findByUsername(username).orElse(null);
 
-            if (user != null && !rateLimitingService.isAllowed(user.getId())) {
+            if (user != null && !rateLimitingService.isAllowed(user.getId(), userIp)) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getWriter().write("Rate limit reached. Please try again later.");
                 return;
             }
+        } else if (!rateLimitingService.isAllowed(null, userIp)) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().write("Rate limit reached. Please try again later.");
+            return;
         }
 
         filterChain.doFilter(request, response);
-    }
-
-    @Override
-    public int getOrder() {
-        return -1;
     }
 }

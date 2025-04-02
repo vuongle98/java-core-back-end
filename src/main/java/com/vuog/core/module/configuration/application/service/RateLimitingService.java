@@ -2,5 +2,5 @@ package com.vuog.core.module.configuration.application.service;
 
 public interface RateLimitingService {
 
-    boolean isAllowed(Long userId);
+    boolean isAllowed(Long userId, String requestIp);
 }

@@ -30,6 +30,22 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
+    @PostMapping("/refresh")
+    public ResponseEntity<ApiResponse<JwtResponseDto>> refresh(
+            @RequestParam String token
+    ) {
+        JwtResponseDto response = authService.refreshToken(token);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<String>> logout(
+    ) {
+        authService.logout();
+
+        return ResponseEntity.ok(ApiResponse.success("Logout successfully"));
+    }
+
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<UserDto>> register(
             @RequestBody CreateUserReq request
@@ -47,8 +63,6 @@ public class AuthController {
         UserDto userInfo = new UserDto(response);
         return ResponseEntity.ok(ApiResponse.success(userInfo));
     }
-
-
 
 
 }

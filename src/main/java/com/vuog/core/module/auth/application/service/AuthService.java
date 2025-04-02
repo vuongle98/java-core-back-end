@@ -9,9 +9,11 @@ public interface AuthService {
 
     JwtResponseDto getToken(LoginCommand command);
 
+    JwtResponseDto refreshToken(String refreshToken);
+
     User register(CreateUserReq command);
 
     User verify();
 
-    void logout(String token);
+    void logout();
 }

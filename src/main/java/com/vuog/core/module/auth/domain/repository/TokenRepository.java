@@ -6,6 +6,7 @@ import com.vuog.core.module.auth.domain.model.Token;
 import com.vuog.core.module.auth.domain.model.User;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface TokenRepository extends
@@ -13,8 +14,13 @@ public interface TokenRepository extends
 
     Optional<Token> findByToken(String token);
 
-    Optional<Token> findFirstByUserAndIsBlacklistedFalseAndExpireAtAfterOrderByExpireAtDesc(User user, LocalDateTime expireAt);
+    List<Token> findAllByToken(String token);
+
+    Optional<Token> findFirstByUserAndIsBlacklistedFalseAndExpireAtAfterAndTypeAndTokenOrderByExpireAtDesc(User user, LocalDateTime expiredAt, Token.TokenType type, String token);
+
+    Optional<Token> findFirstByUserAndIsBlacklistedFalseAndExpireAtAfterAndTypeOrderByExpireAtDesc(User user, LocalDateTime expireAt, Token.TokenType type);
 
     boolean existsByTokenAndIsBlacklisted(String token, boolean isBlacklisted);
 
+    List<Token> findAllByUserAndIsBlacklistedFalse(User user);
 }

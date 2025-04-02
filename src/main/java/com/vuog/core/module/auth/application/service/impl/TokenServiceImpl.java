@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -21,8 +22,8 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public Optional<Token> findByUser(User user) {
-        return tokenRepository.findFirstByUserAndIsBlacklistedFalseAndExpireAtAfterOrderByExpireAtDesc(user, LocalDateTime.now());
+    public Optional<Token> findByUserAndType(User user, Token.TokenType tokenType) {
+        return tokenRepository.findFirstByUserAndIsBlacklistedFalseAndExpireAtAfterAndTypeOrderByExpireAtDesc(user, LocalDateTime.now(), tokenType);
     }
 
     /*
@@ -32,7 +33,8 @@ public class TokenServiceImpl implements TokenService {
             String tokenValue,
             Token.TokenType type,
             LocalDateTime expireTime,
-            User user
+            User user,
+            Token relatedToken
     ) {
 
         Token token = new Token();
@@ -41,6 +43,7 @@ public class TokenServiceImpl implements TokenService {
         token.setType(type);
         token.setExpireAt(expireTime);
         token.setIsBlacklisted(false);
+        token.setRelatedToken(token);
 
         return tokenRepository.save(token);
     }
@@ -52,12 +55,29 @@ public class TokenServiceImpl implements TokenService {
         return tokenRepository.existsByTokenAndIsBlacklisted(token, true);
     }
 
-    public void blacklist(String token) {
-        Optional<Token> tokenOpt = tokenRepository.findByToken(token);
-        tokenOpt.ifPresent(t -> {
-            t.setIsBlacklisted(true);
-            tokenRepository.save(t);
-        });
+    public void blacklist(String tokenStr) {
+        List<Token> tokens = tokenRepository.findAllByToken(tokenStr);
+
+        for (Token token : tokens) {
+            token.setIsBlacklisted(true);
+            tokenRepository.save(token);
+        }
+    }
+
+    @Override
+    public List<Token> findAllByUser(User user) {
+        return tokenRepository.findAllByUserAndIsBlacklistedFalse(user);
+    }
+
+    @Override
+    public Optional<Token> findValidByTokenAndUser(String token, User user) {
+        return tokenRepository.findFirstByUserAndIsBlacklistedFalseAndExpireAtAfterAndTypeAndTokenOrderByExpireAtDesc(user, LocalDateTime.now(), Token.TokenType.REFRESH, token);
+    }
+
+    @Override
+    public boolean checkTokenType(String token, Token.TokenType tokenType) {
+//        Optional<Token> tokenOptional = tokenRepository.findFirstByUserAndIsBlacklistedFalseAndExpireAtAfterAndTypeAndTokenOrderByExpireAtDesc()
+        return true;
     }
 
 }

@@ -2,6 +2,7 @@ package com.vuog.core.config;
 
 import com.vuog.core.common.security.CustomAuthorizationManager;
 import com.vuog.core.common.security.CustomPermissionEvaluator;
+import com.vuog.core.common.security.RateLimitingFilter;
 import com.vuog.core.common.security.jwt.AuthEntryPointJwt;
 import com.vuog.core.common.security.jwt.AuthTokenFilter;
 import com.vuog.core.module.auth.application.service.DynamicRoleHierarchyService;
@@ -36,14 +37,15 @@ public class SecurityConfig {
     private final DynamicRoleHierarchyService dynamicRoleHierarchyService;
     private final EndpointSecurityService endpointSecurityService;
     private final CustomAuthorizationManager customAuthorizationManager;
+    private final RateLimitingFilter rateLimitingFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         endpointSecurityService.applyDynamicRules(http);
+        http.addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class);
 
         http.csrf(AbstractHttpConfigurer::disable)
-                .exceptionHandling(exception -> exception.authenticationEntryPoint(authEntryPointJwt))
 //                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
@@ -57,7 +59,9 @@ public class SecurityConfig {
                                 AntPathRequestMatcher.antMatcher("/favicon.ico")
                         ).permitAll()
                         .anyRequest().access(customAuthorizationManager)
-                ).httpBasic(Customizer.withDefaults());
+                )
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(authEntryPointJwt))
+                .httpBasic(Customizer.withDefaults());
 
         http.authenticationProvider(authenticationProvider);
         http.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
