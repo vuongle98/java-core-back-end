@@ -1,17 +1,19 @@
 package com.vuog.core.module.auth.application.service.impl;
 
 import com.vuog.core.common.exception.UserNotFoundException;
-import com.vuog.core.common.util.ObjectMappingUtil;
+import com.vuog.core.common.listener.EntityChangeService;
 import com.vuog.core.module.auth.application.command.CreateUserReq;
-import com.vuog.core.module.auth.application.dto.UserDto;
 import com.vuog.core.module.auth.application.query.UserQuery;
 import com.vuog.core.module.auth.application.service.UserService;
 import com.vuog.core.module.auth.application.specification.UserSpecification;
+import com.vuog.core.module.auth.domain.event.UserCreatedEvent;
+import com.vuog.core.module.auth.domain.event.UserUpdatedEvent;
 import com.vuog.core.module.auth.domain.model.Role;
 import com.vuog.core.module.auth.domain.model.User;
 import com.vuog.core.module.auth.domain.repository.RoleRepository;
 import com.vuog.core.module.auth.domain.repository.UserRepository;
 import com.vuog.core.module.auth.domain.service.UserDomainService;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -29,12 +31,22 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ApplicationEventPublisher eventPublisher;
+    private final EntityChangeService<User> entityChangeService;
 
-    public UserServiceImpl(UserDomainService userDomainService, UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserDomainService userDomainService,
+                           UserRepository userRepository,
+                           RoleRepository roleRepository,
+                           PasswordEncoder passwordEncoder,
+                           ApplicationEventPublisher eventPublisher,
+                           EntityChangeService<User> entityChangeService
+    ) {
         this.userDomainService = userDomainService;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.eventPublisher = eventPublisher;
+        this.entityChangeService = entityChangeService;
     }
 
     @Override
@@ -82,6 +94,9 @@ public class UserServiceImpl implements UserService {
 
         userDomainService.validateUser(user);
 
+        eventPublisher.publishEvent(new UserCreatedEvent(user));
+        entityChangeService.handleEntityChange(user, "PERSIST");
+
         return userRepository.save(user);
     }
 
@@ -99,6 +114,9 @@ public class UserServiceImpl implements UserService {
             roles.add(role);
         }
         existedUser.setRoles(roles);
+
+        eventPublisher.publishEvent(new UserUpdatedEvent(existedUser));
+        entityChangeService.handleEntityChange(existedUser, "UPDATE");
         return userRepository.save(existedUser);
     }
 
@@ -112,5 +130,6 @@ public class UserServiceImpl implements UserService {
         User existedUser = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found."));
         existedUser.setIsDeleted(true);
         userRepository.save(existedUser);
+        entityChangeService.handleEntityChange(existedUser, "REMOVE");
     }
 }

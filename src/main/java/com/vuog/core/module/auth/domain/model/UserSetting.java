@@ -5,10 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 
 @Entity
@@ -17,6 +14,7 @@ import lombok.Setter;
 @Table(name = "user_settings")
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class UserSetting extends BaseModel {
 
     @OneToOne(fetch = FetchType.LAZY)

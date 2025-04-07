@@ -7,11 +7,11 @@ import com.vuog.core.module.auth.application.dto.UserDto;
 import com.vuog.core.module.auth.application.query.UserQuery;
 import com.vuog.core.module.auth.application.service.UserService;
 import com.vuog.core.module.auth.domain.model.User;
+import com.vuog.core.module.configuration.application.annotation.FeatureToggle;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

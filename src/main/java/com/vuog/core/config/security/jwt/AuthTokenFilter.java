@@ -1,4 +1,4 @@
-package com.vuog.core.common.security.jwt;
+package com.vuog.core.config.security.jwt;
 
 import com.vuog.core.common.util.JwtUtils;
 import com.vuog.core.module.auth.application.service.TokenService;

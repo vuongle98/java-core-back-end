@@ -1,4 +1,4 @@
-package com.vuog.core.config;
+package com.vuog.core.config.caching;
 
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.WriteListener;

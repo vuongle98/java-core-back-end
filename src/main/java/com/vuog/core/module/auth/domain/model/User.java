@@ -2,10 +2,7 @@ package com.vuog.core.module.auth.domain.model;
 
 import com.vuog.core.common.base.BaseModel;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,6 +16,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Entity
 @Table(name = "users")
+@ToString(exclude = {"roles", "tokens", "profile", "sessions", "password"})
 public class User extends BaseModel implements UserDetails {
 
     @Column(name = "username")
@@ -43,6 +41,10 @@ public class User extends BaseModel implements UserDetails {
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Session> sessions = new ArrayList<>();
+
+    public User(String username) {
+        this.username = username;
+    }
 
     public User(
             String username,

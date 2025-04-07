@@ -1,4 +1,4 @@
-package com.vuog.core.config;
+package com.vuog.core.module.rest.shared.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vuog.core.module.rest.application.service.GenericRestService;

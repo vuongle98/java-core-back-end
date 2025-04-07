@@ -1,4 +1,4 @@
-package com.vuog.core.config;
+package com.vuog.core.config.caching;
 
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletComponentScan;

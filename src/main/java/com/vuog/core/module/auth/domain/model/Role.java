@@ -15,6 +15,7 @@ import java.util.Set;
 @Builder
 @Entity
 @Table(name = "roles")
+@ToString
 public class Role extends BaseModel {
 
     @Column(name = "name")

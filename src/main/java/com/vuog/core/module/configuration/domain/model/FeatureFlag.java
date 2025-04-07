@@ -18,7 +18,11 @@ public class FeatureFlag extends BaseModel {
 
     private String name;
     private String value;
+    private Environment environment;
     private Boolean enabled;
     private String description;
 
+    public enum Environment {
+        DEVELOPMENT, PRODUCTION, STAGING
+    }
 }

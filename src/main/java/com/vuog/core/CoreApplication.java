@@ -6,9 +6,11 @@ import jakarta.annotation.Resource;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 @SpringBootApplication
 @EnableAutoGenericRest
+@EnableAspectJAutoProxy
 public class CoreApplication implements CommandLineRunner {
 
     @Resource

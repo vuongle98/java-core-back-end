@@ -7,10 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.net.InetAddress;
 
@@ -20,11 +17,20 @@ import java.net.InetAddress;
 @NoArgsConstructor
 @Entity
 @Table(name = "user_request_logs")
+@ToString
 public class UserRequestLog extends BaseModel {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
     private InetAddress ipAddress;
+
+    private String uri;
+
+    private String method;
+
+    private String payload;
+
+    private String queryString;
 
 }

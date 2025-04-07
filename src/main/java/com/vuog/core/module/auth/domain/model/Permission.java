@@ -2,10 +2,7 @@ package com.vuog.core.module.auth.domain.model;
 
 import com.vuog.core.common.base.BaseModel;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -16,6 +13,7 @@ import java.util.Set;
 @Table(name = "permissions")
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class Permission extends BaseModel {
 
     @Column(name = "name")

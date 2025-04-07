@@ -1,4 +1,4 @@
-package com.vuog.core.config;
+package com.vuog.core.config.caching;
 
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
@@ -14,7 +14,7 @@ import java.time.Duration;
 
 @Configuration
 @EnableCaching
-public class CachingConfig {
+public class RedisCachingConfig {
 
     @Bean
     public RedisCacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {

@@ -1,4 +1,4 @@
-package com.vuog.core.common.security;
+package com.vuog.core.config.security;
 
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.AuthorizationManager;

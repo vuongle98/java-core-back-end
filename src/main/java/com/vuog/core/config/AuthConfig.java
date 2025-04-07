@@ -1,7 +1,5 @@
 package com.vuog.core.config;
 
-import com.vuog.core.common.exception.UserNotFoundException;
-import com.vuog.core.module.auth.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +15,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @RequiredArgsConstructor
 public class AuthConfig {
 
-    private final UserRepository userRepository;
     private final UserDetailsService userDetailsService;
 
     @Bean

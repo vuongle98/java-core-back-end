@@ -1,4 +1,4 @@
-package com.vuog.core.common.security.jwt;
+package com.vuog.core.config.security.jwt;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

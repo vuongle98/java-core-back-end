@@ -2,6 +2,8 @@ package com.vuog.core.config;
 
 import com.vuog.core.module.auth.domain.model.*;
 import com.vuog.core.module.auth.domain.repository.*;
+import com.vuog.core.module.configuration.domain.model.FeatureFlag;
+import com.vuog.core.module.configuration.domain.repository.FeatureFlagRepository;
 import org.reflections.Reflections;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -169,6 +171,23 @@ public class DatabaseSeeder {
             }
 
             System.out.println("Added endpoint secures");
+        };
+    }
+
+    @Bean
+    CommandLineRunner initFeature(FeatureFlagRepository featureFlagRepository) {
+
+        return args -> {
+            featureFlagRepository.findByName("TEST").orElseGet(() -> {
+                FeatureFlag featureFlag = new FeatureFlag();
+                featureFlag.setName("TEST");
+                featureFlag.setEnabled(true);
+                featureFlag.setValue("TEST value");
+                featureFlag.setDescription("TEST description");
+                featureFlag.setEnvironment(FeatureFlag.Environment.DEVELOPMENT);
+                featureFlag = featureFlagRepository.save(featureFlag);
+                return featureFlag;
+            });
         };
     }
 

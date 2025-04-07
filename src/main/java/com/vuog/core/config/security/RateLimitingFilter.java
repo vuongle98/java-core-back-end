@@ -1,4 +1,4 @@
-package com.vuog.core.common.security;
+package com.vuog.core.config.security;
 
 import com.vuog.core.module.auth.domain.model.User;
 import com.vuog.core.module.auth.domain.repository.UserRepository;
@@ -12,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.util.ContentCachingRequestWrapper;
 
 import java.io.IOException;
 
@@ -28,6 +29,7 @@ public class RateLimitingFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         String userIp = request.getRemoteAddr();

@@ -1,4 +1,4 @@
-package com.vuog.core.config;
+package com.vuog.core.config.caching;
 
 import com.vuog.core.module.configuration.infrastructure.service.RedisCacheService;
 import jakarta.servlet.FilterChain;
@@ -94,7 +94,11 @@ public class CustomCacheFilter extends OncePerRequestFilter {
                 }
             }
         } catch (Exception e) {
-            logger.error("Error during caching operation for key: {}", cacheKey, e);
+            if (e.getCause().getClass().equals(UnsupportedOperationException.class)) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Feature is not enabled");
+            } else {
+                logger.error("Error during caching operation for key: {}", cacheKey, e);
+            }
         }
 
         // Add headers for fresh response

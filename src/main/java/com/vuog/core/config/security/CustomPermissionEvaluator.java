@@ -1,4 +1,4 @@
-package com.vuog.core.common.security;
+package com.vuog.core.config.security;
 
 import com.vuog.core.module.auth.domain.model.User;
 import org.springframework.security.access.PermissionEvaluator;

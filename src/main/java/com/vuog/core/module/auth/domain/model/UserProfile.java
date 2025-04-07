@@ -2,10 +2,7 @@ package com.vuog.core.module.auth.domain.model;
 
 import com.vuog.core.common.base.BaseModel;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Getter
@@ -13,6 +10,7 @@ import lombok.Setter;
 @Table(name = "user_profiles")
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class UserProfile extends BaseModel {
 
     @OneToOne(mappedBy = "profile")

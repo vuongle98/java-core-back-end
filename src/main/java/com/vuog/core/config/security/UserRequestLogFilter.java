@@ -1,0 +1,69 @@
+package com.vuog.core.config.security;
+
+
+import com.vuog.core.module.auth.domain.model.User;
+import com.vuog.core.module.auth.domain.repository.UserRepository;
+import com.vuog.core.module.logging.domain.event.UserRequestLogEvent;
+import com.vuog.core.module.logging.domain.model.UserRequestLog;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.util.ContentCachingRequestWrapper;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.InetAddress;
+import java.util.stream.Collectors;
+
+@Component
+public class UserRequestLogFilter extends OncePerRequestFilter {
+
+    private final UserRepository userRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
+
+    public UserRequestLogFilter(UserRepository userRepository, ApplicationEventPublisher applicationEventPublisher) {
+        this.userRepository = userRepository;
+        this.applicationEventPublisher = applicationEventPublisher;
+    }
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        String userIp = request.getRemoteAddr();
+        String method = request.getMethod();
+        String uri = request.getRequestURI();
+
+        UserRequestLog userRequestLog = new UserRequestLog();
+        userRequestLog.setMethod(method);
+        userRequestLog.setUri(uri);
+        userRequestLog.setIpAddress(InetAddress.getByName(userIp));
+        userRequestLog.setQueryString(request.getQueryString());
+
+        ContentCachingRequestWrapper wrappedRequest = new ContentCachingRequestWrapper(request);
+        filterChain.doFilter(wrappedRequest, response);
+
+        byte[] bodyBytes = wrappedRequest.getContentAsByteArray();
+        String body = new String(bodyBytes, wrappedRequest.getCharacterEncoding());
+
+        userRequestLog.setPayload(body);
+
+        if (auth != null && auth.isAuthenticated()) {
+            String username = auth.getName();
+            User user = userRepository.findByUsername(username).orElse(null);
+            userRequestLog.setUser(user);
+        } else {
+            userRequestLog.setUser(new User("ANONYMOUS"));
+        }
+
+        applicationEventPublisher.publishEvent(new UserRequestLogEvent(userRequestLog));
+    }
+}

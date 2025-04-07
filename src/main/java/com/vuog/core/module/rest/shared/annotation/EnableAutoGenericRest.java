@@ -1,6 +1,6 @@
 package com.vuog.core.module.rest.shared.annotation;
 
-import com.vuog.core.config.LiteRestAutoConfiguration;
+import com.vuog.core.module.rest.shared.config.LiteRestAutoConfiguration;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.ElementType;
