@@ -7,7 +7,7 @@ import com.vuog.core.module.auth.domain.repository.TokenRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,7 +23,7 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public Optional<Token> findByUserAndType(User user, Token.TokenType tokenType) {
-        return tokenRepository.findFirstByUserAndIsBlacklistedFalseAndExpireAtAfterAndTypeOrderByExpireAtDesc(user, LocalDateTime.now(), tokenType);
+        return tokenRepository.findFirstByUserAndIsBlacklistedFalseAndExpireAtAfterAndTypeOrderByExpireAtDesc(user, Instant.now(), tokenType);
     }
 
     /*
@@ -32,7 +32,7 @@ public class TokenServiceImpl implements TokenService {
     public Token create(
             String tokenValue,
             Token.TokenType type,
-            LocalDateTime expireTime,
+            Instant expireTime,
             User user,
             Token relatedToken
     ) {
@@ -71,7 +71,7 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public Optional<Token> findValidByTokenAndUser(String token, User user) {
-        return tokenRepository.findFirstByUserAndIsBlacklistedFalseAndExpireAtAfterAndTypeAndTokenOrderByExpireAtDesc(user, LocalDateTime.now(), Token.TokenType.REFRESH, token);
+        return tokenRepository.findFirstByUserAndIsBlacklistedFalseAndExpireAtAfterAndTypeAndTokenOrderByExpireAtDesc(user, Instant.now(), Token.TokenType.REFRESH, token);
     }
 
     @Override

@@ -9,12 +9,14 @@ import com.vuog.core.module.auth.domain.model.User;
 import com.vuog.core.module.auth.domain.model.UserSetting;
 import com.vuog.core.module.auth.domain.repository.UserSettingRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class UserSettingServiceImpl implements UserSettingService {
 
     private final UserSettingRepository userSettingRepository;

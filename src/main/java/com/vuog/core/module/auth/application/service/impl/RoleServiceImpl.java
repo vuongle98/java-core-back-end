@@ -8,10 +8,12 @@ import com.vuog.core.module.auth.domain.repository.RoleRepository;
 import com.vuog.core.module.auth.domain.service.RoleDomainService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 
 @Service
+@Transactional
 public class RoleServiceImpl implements RoleService {
 
     private final RoleRepository roleRepository;

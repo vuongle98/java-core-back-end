@@ -1,7 +1,9 @@
 package com.vuog.core.module.auth.domain.model;
 
 import com.vuog.core.common.base.BaseModel;
+import com.vuog.core.common.listener.EntityChangeListener;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
 import lombok.*;
 
@@ -12,6 +14,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
+@EntityListeners({EntityChangeListener.class})
 public class EndpointSecure extends BaseModel {
 
     private String endpointPattern;

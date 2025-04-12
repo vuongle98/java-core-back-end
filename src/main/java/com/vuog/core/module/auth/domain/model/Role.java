@@ -2,6 +2,7 @@ package com.vuog.core.module.auth.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.vuog.core.common.base.BaseModel;
+import com.vuog.core.common.listener.EntityChangeListener;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,6 +18,7 @@ import java.util.Set;
 @Entity
 @Table(name = "roles")
 @ToString(exclude = {"permissions", "users"})
+@EntityListeners(EntityChangeListener.class)
 public class Role extends BaseModel {
 
     @Column(name = "name")

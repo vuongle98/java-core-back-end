@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Entity
 @Table(name = "users")
-@ToString(exclude = {"roles", "tokens", "profile", "sessions", "password"})
+@ToString(exclude = {"roles", "tokens", "profile", "password"})
 @EntityListeners(EntityChangeListener.class)
 public class User extends BaseModel implements UserDetails {
 
@@ -40,9 +40,6 @@ public class User extends BaseModel implements UserDetails {
 
     @OneToOne(fetch = FetchType.LAZY)
     private UserProfile profile;
-
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<Session> sessions = new ArrayList<>();
 
     public User(String username) {
         this.username = username;
@@ -101,7 +98,7 @@ public class User extends BaseModel implements UserDetails {
     }
 
     public boolean isSuperAdmin() {
-        return this.getRoles().stream().anyMatch(role -> role.getName().equalsIgnoreCase("SUPER_ADMIN"));
+        return this.getRoles().stream().anyMatch(role -> role.getCode().equalsIgnoreCase("SUPER_ADMIN"));
     }
 
     @Override

@@ -1,5 +1,9 @@
 package com.vuog.core.module.rest.infrastructure.projection;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -8,7 +12,7 @@ import java.lang.reflect.*;
 import java.sql.Time;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -51,7 +55,7 @@ public class ProjectionHandler {
             ProjectionKey key = new ProjectionKey(entity, projectionClass);
             @SuppressWarnings("unchecked")
             D cachedResult = (D) projectionCache.get(key);
-            if (cachedResult != null) {
+            if (cachedResult != null && !isProjectionChanged(entity, cachedResult, projectionClass)) {
                 return cachedResult;
             }
 
@@ -355,11 +359,11 @@ public class ProjectionHandler {
                     return Short.valueOf(value.toString());
                 } else if (targetType == String.class) {
                     return value.toString();
-                } else if (targetType == java.time.LocalDateTime.class) {
-                    if (value instanceof java.time.LocalDateTime) {
+                } else if (targetType == java.time.Instant.class) {
+                    if (value instanceof java.time.Instant) {
                         return value;
                     }
-                    return java.time.LocalDateTime.parse(value.toString());
+                    return java.time.Instant.parse(value.toString());
                 } else if (targetType == java.time.LocalDate.class) {
                     if (value instanceof java.time.LocalDate) {
                         return value;
@@ -390,7 +394,6 @@ public class ProjectionHandler {
                 type == Long.class ||
                 type == Short.class ||
                 type == String.class ||
-                type == LocalDateTime.class ||
                 type == LocalDate.class ||
                 type == LocalTime.class ||
                 type == Date.class ||
@@ -598,6 +601,28 @@ public class ProjectionHandler {
         return null;
     }
 
+    private boolean isProjectionChanged(Object entity, Object cachedProjection, Class<?> projectionClass) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.registerModule(new JavaTimeModule()); // hỗ trợ Instant, LocalDateTime, etc.
+            mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
+            // Dựng projection hiện tại từ entity
+            Object currentProjection = projectionClass.isInterface()
+                    ? createInterfaceProxy(entity, projectionClass)
+                    : createClassInstance(entity, projectionClass);
+
+            // So sánh JSON
+            String json1 = mapper.writeValueAsString(currentProjection);
+            String json2 = mapper.writeValueAsString(cachedProjection);
+
+            return !json1.equals(json2); // nếu khác => cần cập nhật cache
+        } catch (JsonProcessingException e) {
+            logger.warn("Error comparing projection JSON", e);
+            return true;
+        }
+    }
+
     private static class ProjectionKey {
         private final Object entity;
         private final Class<?> projectionClass;
@@ -612,12 +637,25 @@ public class ProjectionHandler {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             ProjectionKey that = (ProjectionKey) o;
+            if (deepEquals(this.entity, that.entity)) return true;
             return Objects.equals(entity, that.entity) && Objects.equals(projectionClass, that.projectionClass);
         }
 
         @Override
         public int hashCode() {
             return Objects.hash(entity, projectionClass);
+        }
+
+        private boolean deepEquals(Object o1, Object o2) {
+            try {
+                ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
+                String json1 = mapper.writeValueAsString(o1);
+                String json2 = mapper.writeValueAsString(o2);
+                return json1.equals(json2);
+            } catch (JsonProcessingException e) {
+                logger.warn("Error comparing entities for deepEquals", e);
+                return false;
+            }
         }
     }
 }

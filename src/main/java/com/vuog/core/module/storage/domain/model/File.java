@@ -1,15 +1,10 @@
 package com.vuog.core.module.storage.domain.model;
 
 import com.vuog.core.common.base.BaseModel;
+import com.vuog.core.common.listener.EntityChangeListener;
 import com.vuog.core.module.auth.domain.model.User;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Getter
 @Setter
@@ -17,6 +12,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 @Table(name = "files")
+@ToString
+@EntityListeners(EntityChangeListener.class)
 public class File extends BaseModel {
 
     @ManyToOne(fetch = FetchType.LAZY)

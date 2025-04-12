@@ -5,7 +5,7 @@ import com.vuog.core.common.listener.EntityChangeListener;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Getter
 @Setter
@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "tokens")
 @EntityListeners(EntityChangeListener.class)
+@ToString(exclude = {"relatedToken"})
 public class Token extends BaseModel {
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -24,9 +25,9 @@ public class Token extends BaseModel {
     @Enumerated(EnumType.STRING)
     private TokenType type;
 
-    private LocalDateTime expireAt;
+    private Instant expireAt;
 
-    private LocalDateTime issuedAt;
+    private Instant issuedAt;
 
     @Column(name = "is_black_listed")
     private Boolean isBlacklisted;

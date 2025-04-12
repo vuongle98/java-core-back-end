@@ -4,7 +4,7 @@
 //import com.vuog.core.module.configuration.domain.repository.RateLimitingRepository;
 //import org.springframework.stereotype.Service;
 //
-//import java.time.LocalDateTime;
+//import java.time.Instant;
 //
 //@Service
 //public class DatabaseRateLimitingService implements RateLimitingService {
@@ -21,11 +21,11 @@
 //
 //    @Override
 //    public boolean isAllowed(Long userId) {
-//        LocalDateTime timeWindowStart = LocalDateTime.now().minusSeconds(TIME_WINDOW);
+//        Instant timeWindowStart = Instant.now().minusSeconds(TIME_WINDOW);
 //        long requestCount = limitingRepository.countRequests(userId, timeWindowStart);
 //
 //        if (requestCount < REQUEST_LIMIT) {
-//            limitingRepository.logRequest(userId, LocalDateTime.now());
+//            limitingRepository.logRequest(userId, Instant.now());
 //            return true;
 //        } else {
 //            return false;

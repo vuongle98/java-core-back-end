@@ -21,7 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
@@ -77,7 +77,7 @@ public class AuthServiceImpl implements AuthService {
                 tokenService.create(
                         refreshToken,
                         Token.TokenType.REFRESH,
-                        LocalDateTime.now().plus(refreshTokenExpireTime, ChronoUnit.MILLIS),
+                        Instant.now().plus(refreshTokenExpireTime, ChronoUnit.MILLIS),
                         user, token);
             }
 
@@ -95,12 +95,12 @@ public class AuthServiceImpl implements AuthService {
 
             Token token  = tokenService.create(jwt,
                     Token.TokenType.ACCESS,
-                    LocalDateTime.now().plus(tokenExpireTime, ChronoUnit.MILLIS),
+                    Instant.now().plus(tokenExpireTime, ChronoUnit.MILLIS),
                     user, null);
             tokenService.create(
                     refreshToken,
                     Token.TokenType.REFRESH,
-                    LocalDateTime.now().plus(refreshTokenExpireTime, ChronoUnit.MILLIS),
+                    Instant.now().plus(refreshTokenExpireTime, ChronoUnit.MILLIS),
                     user, token);
 
             return JwtResponseDto
@@ -140,7 +140,7 @@ public class AuthServiceImpl implements AuthService {
 
         tokenService.create(newToken,
                 Token.TokenType.ACCESS,
-                LocalDateTime.now().plus(tokenExpireTime, ChronoUnit.MILLIS),
+                Instant.now().plus(tokenExpireTime, ChronoUnit.MILLIS),
                 user, refreshTokenDB.get());
 
         return JwtResponseDto

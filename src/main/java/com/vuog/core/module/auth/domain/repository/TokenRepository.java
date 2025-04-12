@@ -5,7 +5,7 @@ import com.vuog.core.common.base.BaseRepository;
 import com.vuog.core.module.auth.domain.model.Token;
 import com.vuog.core.module.auth.domain.model.User;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,9 +16,9 @@ public interface TokenRepository extends
 
     List<Token> findAllByToken(String token);
 
-    Optional<Token> findFirstByUserAndIsBlacklistedFalseAndExpireAtAfterAndTypeAndTokenOrderByExpireAtDesc(User user, LocalDateTime expiredAt, Token.TokenType type, String token);
+    Optional<Token> findFirstByUserAndIsBlacklistedFalseAndExpireAtAfterAndTypeAndTokenOrderByExpireAtDesc(User user, Instant expiredAt, Token.TokenType type, String token);
 
-    Optional<Token> findFirstByUserAndIsBlacklistedFalseAndExpireAtAfterAndTypeOrderByExpireAtDesc(User user, LocalDateTime expireAt, Token.TokenType type);
+    Optional<Token> findFirstByUserAndIsBlacklistedFalseAndExpireAtAfterAndTypeOrderByExpireAtDesc(User user, Instant expireAt, Token.TokenType type);
 
     boolean existsByTokenAndIsBlacklisted(String token, boolean isBlacklisted);
 
