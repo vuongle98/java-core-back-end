@@ -1,8 +1,12 @@
 package com.vuog.core.module.rest.application.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.vuog.core.common.event.AuditLogEvent;
 import com.vuog.core.common.exception.DataNotFoundException;
+import com.vuog.core.common.listener.EntityChangeService;
+import com.vuog.core.common.util.Context;
 import com.vuog.core.common.util.ObjectMappingUtil;
+import com.vuog.core.module.auth.application.dto.UserDto;
 import com.vuog.core.module.rest.domain.repository.GenericRepository;
 import com.vuog.core.module.rest.domain.repository.SpecificationBuilder;
 import com.vuog.core.module.rest.infrastructure.projection.ProjectionHandler;
@@ -14,6 +18,7 @@ import jakarta.persistence.OneToOne;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -33,16 +38,18 @@ public class GenericRestService {
     private final ProjectionRegistry projectionRegistry;
     private final ObjectMapper objectMapper;
     private final ApplicationContext applicationContext;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public GenericRestService(
             ProjectionHandler projectionHandler,
             ProjectionRegistry projectionRegistry,
             ObjectMapper objectMapper,
-            ApplicationContext applicationContext) {
+            ApplicationContext applicationContext, ApplicationEventPublisher applicationEventPublisher) {
         this.projectionHandler = projectionHandler;
         this.projectionRegistry = projectionRegistry;
         this.objectMapper = objectMapper;
         this.applicationContext = applicationContext;
+        this.applicationEventPublisher = applicationEventPublisher;
     }
 
     @SuppressWarnings("unchecked")
@@ -78,7 +85,19 @@ public class GenericRestService {
     }
 
     public <T, ID> void delete(GenericRepository<T, ID> repository, ID id) {
-        repository.deleteById(id);
+        Optional<T> needDeleted = findById(repository, id);
+        if (needDeleted.isPresent()) {
+            repository.deleteById(id);
+
+            Map<String, Object> auditLog = new HashMap<>();
+            auditLog.put("entity", needDeleted);
+            auditLog.put("action", "REMOVE");
+            auditLog.put("timestamp", System.currentTimeMillis());
+            auditLog.put("entityName", needDeleted.getClass().getSimpleName());
+            auditLog.put("who", new UserDto(Context.getUser()));
+
+            applicationEventPublisher.publishEvent(new AuditLogEvent(auditLog));
+        }
     }
 
     public <T> List<Map<String, Object>> getProjectedData(List<T> data, List<String> fields) {
@@ -109,6 +128,15 @@ public class GenericRestService {
         handleRelationships(entity, createReq, entityClass);
         T savedEntity = save(repository, entity);
 
+        Map<String, Object> auditLog = new HashMap<>();
+        auditLog.put("entity", savedEntity);
+        auditLog.put("action", "PERSIST");
+        auditLog.put("timestamp", System.currentTimeMillis());
+        auditLog.put("entityName", entity.getClass().getSimpleName());
+        auditLog.put("who", new UserDto(Context.getUser()));
+
+        applicationEventPublisher.publishEvent(new AuditLogEvent(auditLog));
+
         if (projectionClass != null) {
             try {
                 Field idField = findIdField(entityClass);
@@ -131,6 +159,15 @@ public class GenericRestService {
         objectMapper.updateValue(existingEntity, updateReq);
         handleRelationships(existingEntity, updateReq, repository.getEntityClass());
         T savedEntity = save(repository, existingEntity);
+
+        Map<String, Object> auditLog = new HashMap<>();
+        auditLog.put("entity", existingEntity);
+        auditLog.put("action", "UPDATE");
+        auditLog.put("timestamp", System.currentTimeMillis());
+        auditLog.put("entityName", existingEntity.getClass().getSimpleName());
+        auditLog.put("who", new UserDto(Context.getUser()));
+
+        applicationEventPublisher.publishEvent(new AuditLogEvent(auditLog));
 
         if (projectionClass != null) {
             try {

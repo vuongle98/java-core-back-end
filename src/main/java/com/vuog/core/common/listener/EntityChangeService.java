@@ -1,10 +1,11 @@
 package com.vuog.core.common.listener;
 
+import com.vuog.core.common.base.BaseDto;
 import com.vuog.core.common.base.BaseModel;
 import org.springframework.stereotype.Service;
 
 @Service
-public class EntityChangeService<T extends BaseModel> {
+public class EntityChangeService<T extends BaseDto> {
 
     private final EntityChangeListener<T> entityChangeListener;
 

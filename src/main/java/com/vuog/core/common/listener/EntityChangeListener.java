@@ -1,15 +1,19 @@
 package com.vuog.core.common.listener;
 
+import com.vuog.core.common.base.BaseDto;
 import com.vuog.core.common.base.BaseModel;
+import com.vuog.core.common.event.AuditLogEvent;
 import com.vuog.core.common.util.Context;
-import com.vuog.core.module.logging.domain.event.AuditLogEvent;
-import com.vuog.core.module.logging.domain.model.AuditLog;
+import com.vuog.core.module.auth.application.dto.UserDto;
 import jakarta.persistence.*;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Component
-public class EntityChangeListener<T extends BaseModel> {
+public class EntityChangeListener<T extends BaseDto> {
 
     private final ApplicationEventPublisher applicationEventPublisher;
 
@@ -29,6 +33,15 @@ public class EntityChangeListener<T extends BaseModel> {
     public void afterPersist(Object entity) {
         // Handle post-persist logic
         System.out.println("After Persist: " + entity);
+
+        Map<String, Object> auditLog = new HashMap<>();
+        auditLog.put("entity", entity);
+        auditLog.put("action", "PERSIST");
+        auditLog.put("timestamp", System.currentTimeMillis());
+        auditLog.put("entityName", entity.getClass().getSimpleName());
+        auditLog.put("who", new UserDto(Context.getUser()));
+
+        applicationEventPublisher.publishEvent(new AuditLogEvent(auditLog));
     }
 
     // Called before the entity is updated
@@ -43,10 +56,13 @@ public class EntityChangeListener<T extends BaseModel> {
     public void afterUpdate(T entity) {
         // Handle post-update logic
         System.out.println("After Update: " + entity);
-        AuditLog auditLog = new AuditLog();
-        auditLog.setEntityId(entity.getId().toString());
-        auditLog.setEntity(entity.toString());
-        auditLog.setUser(Context.getUser());
+
+        Map<String, Object> auditLog = new HashMap<>();
+        auditLog.put("entity", entity);
+        auditLog.put("action", "UPDATE");
+        auditLog.put("timestamp", System.currentTimeMillis());
+        auditLog.put("entityName", entity.getClass().getSimpleName());
+        auditLog.put("who", new UserDto(Context.getUser()));
 
         applicationEventPublisher.publishEvent(new AuditLogEvent(auditLog));
     }
@@ -63,5 +79,14 @@ public class EntityChangeListener<T extends BaseModel> {
     public void afterRemove(Object entity) {
         // Handle post-remove logic
         System.out.println("After Remove: " + entity);
+
+        Map<String, Object> auditLog = new HashMap<>();
+        auditLog.put("entity", entity);
+        auditLog.put("action", "REMOVE");
+        auditLog.put("timestamp", System.currentTimeMillis());
+        auditLog.put("entityName", entity.getClass().getSimpleName());
+        auditLog.put("who", new UserDto(Context.getUser()));
+
+        applicationEventPublisher.publishEvent(new AuditLogEvent(auditLog));
     }
 }

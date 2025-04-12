@@ -12,4 +12,6 @@ public interface RoleRepository extends
 
     Optional<Role> findByName(String name);
     Optional<Role> findByCode(String code);
+
+    boolean existsByChildRolesContaining(Role role);
 }

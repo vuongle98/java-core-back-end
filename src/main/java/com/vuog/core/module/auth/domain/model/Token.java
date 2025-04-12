@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Entity
 @Table(name = "tokens")
-@ToString
 @EntityListeners(EntityChangeListener.class)
 public class Token extends BaseModel {
 

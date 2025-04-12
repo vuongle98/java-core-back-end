@@ -1,10 +1,11 @@
 package com.vuog.core.config.security;
 
 
+import com.vuog.core.common.dto.UserRequestLog;
+import com.vuog.core.common.event.UserRequestLogEvent;
+import com.vuog.core.module.auth.application.dto.UserDto;
 import com.vuog.core.module.auth.domain.model.User;
 import com.vuog.core.module.auth.domain.repository.UserRepository;
-import com.vuog.core.module.logging.domain.event.UserRequestLogEvent;
-import com.vuog.core.module.logging.domain.model.UserRequestLog;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,11 +17,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.InetAddress;
-import java.util.stream.Collectors;
 
 @Component
 public class UserRequestLogFilter extends OncePerRequestFilter {
@@ -58,10 +56,10 @@ public class UserRequestLogFilter extends OncePerRequestFilter {
 
         if (auth != null && auth.isAuthenticated()) {
             String username = auth.getName();
-            User user = userRepository.findByUsername(username).orElse(null);
-            userRequestLog.setUser(user);
+            User user = userRepository.findByUsername(username).orElseGet(() -> new User(username));
+            userRequestLog.setUser(new UserDto(user));
         } else {
-            userRequestLog.setUser(new User("ANONYMOUS"));
+            userRequestLog.setUser(new UserDto("ANONYMOUS"));
         }
 
         applicationEventPublisher.publishEvent(new UserRequestLogEvent(userRequestLog));

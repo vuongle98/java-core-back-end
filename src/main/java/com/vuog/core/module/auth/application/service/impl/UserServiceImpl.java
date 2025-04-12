@@ -3,6 +3,7 @@ package com.vuog.core.module.auth.application.service.impl;
 import com.vuog.core.common.exception.UserNotFoundException;
 import com.vuog.core.common.listener.EntityChangeService;
 import com.vuog.core.module.auth.application.command.CreateUserReq;
+import com.vuog.core.module.auth.application.dto.UserDto;
 import com.vuog.core.module.auth.application.query.UserQuery;
 import com.vuog.core.module.auth.application.service.UserService;
 import com.vuog.core.module.auth.application.specification.UserSpecification;
@@ -32,14 +33,14 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final ApplicationEventPublisher eventPublisher;
-    private final EntityChangeService<User> entityChangeService;
+    private final EntityChangeService<UserDto> entityChangeService;
 
     public UserServiceImpl(UserDomainService userDomainService,
                            UserRepository userRepository,
                            RoleRepository roleRepository,
                            PasswordEncoder passwordEncoder,
                            ApplicationEventPublisher eventPublisher,
-                           EntityChangeService<User> entityChangeService
+                           EntityChangeService<UserDto> entityChangeService
     ) {
         this.userDomainService = userDomainService;
         this.userRepository = userRepository;
@@ -95,7 +96,7 @@ public class UserServiceImpl implements UserService {
         userDomainService.validateUser(user);
 
         eventPublisher.publishEvent(new UserCreatedEvent(user));
-        entityChangeService.handleEntityChange(user, "PERSIST");
+        entityChangeService.handleEntityChange(new UserDto(user), "PERSIST");
 
         return userRepository.save(user);
     }
@@ -116,7 +117,7 @@ public class UserServiceImpl implements UserService {
         existedUser.setRoles(roles);
 
         eventPublisher.publishEvent(new UserUpdatedEvent(existedUser));
-        entityChangeService.handleEntityChange(existedUser, "UPDATE");
+        entityChangeService.handleEntityChange(new UserDto(existedUser), "UPDATE");
         return userRepository.save(existedUser);
     }
 
@@ -130,6 +131,6 @@ public class UserServiceImpl implements UserService {
         User existedUser = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found."));
         existedUser.setIsDeleted(true);
         userRepository.save(existedUser);
-        entityChangeService.handleEntityChange(existedUser, "REMOVE");
+        entityChangeService.handleEntityChange(new UserDto(existedUser), "REMOVE");
     }
 }

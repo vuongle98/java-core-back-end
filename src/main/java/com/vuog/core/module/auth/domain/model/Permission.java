@@ -1,6 +1,7 @@
 package com.vuog.core.module.auth.domain.model;
 
 import com.vuog.core.common.base.BaseModel;
+import com.vuog.core.common.listener.EntityChangeListener;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,7 +14,8 @@ import java.util.Set;
 @Table(name = "permissions")
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
+@ToString(exclude = {"roles"})
+@EntityListeners(EntityChangeListener.class)
 public class Permission extends BaseModel {
 
     @Column(name = "name")

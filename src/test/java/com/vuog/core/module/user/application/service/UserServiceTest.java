@@ -22,14 +22,14 @@ class UserServiceTest {
     private UserService userService;
 
     @Test
-    void createUser_ShouldReturnUserDto() {
+    void createUser_ShouldReturnUser() {
         // Arrange
         CreateUserReq request = new CreateUserReq();
         User user = new User();
         when(userRepository.save(any(User.class))).thenReturn(user);
 
         // Act
-        UserDto result = userService.create(request);
+        User result = userService.create(request);
 
         // Assert
         assertNotNull(result);

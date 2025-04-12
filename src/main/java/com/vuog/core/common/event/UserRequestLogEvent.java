@@ -1,17 +1,16 @@
-package com.vuog.core.module.logging.domain.event;
+package com.vuog.core.common.event;
 
-import com.vuog.core.common.event.DomainEvent;
-import com.vuog.core.module.logging.domain.model.UserRequestLog;
+import com.vuog.core.common.dto.UserRequestLog;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 @Data
-@RequiredArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class UserRequestLogEvent implements DomainEvent {
 
-    private UserRequestLog requestLog;
+    private UserRequestLog userRequestLog;
 
     @Override
     public String eventName() {
@@ -20,7 +19,7 @@ public class UserRequestLogEvent implements DomainEvent {
 
     @Override
     public String toPayload() {
-        return requestLog.toString();
+        return userRequestLog.toString();
     }
 
     @Override

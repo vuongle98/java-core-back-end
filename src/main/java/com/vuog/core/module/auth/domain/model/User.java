@@ -1,6 +1,7 @@
 package com.vuog.core.module.auth.domain.model;
 
 import com.vuog.core.common.base.BaseModel;
+import com.vuog.core.common.listener.EntityChangeListener;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 @Entity
 @Table(name = "users")
 @ToString(exclude = {"roles", "tokens", "profile", "sessions", "password"})
+@EntityListeners(EntityChangeListener.class)
 public class User extends BaseModel implements UserDetails {
 
     @Column(name = "username")
@@ -75,17 +77,6 @@ public class User extends BaseModel implements UserDetails {
         return authorities.stream()
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
-
-//        return roles.stream()
-//                .flatMap(role -> {
-//                    // Add both role and permissions as authorities
-//                    Set<GrantedAuthority> authorities = role.getPermissions().stream()
-//                            .map(permission -> new SimpleGrantedAuthority("ROLE_" + permission.getCode()))
-//                            .collect(Collectors.toSet());
-//                    authorities.add(new SimpleGrantedAuthority(role.getCode())); // Use role code instead of name
-//                    return authorities.stream();
-//                })
-//                .collect(Collectors.toList());
     }
 
     // Đệ quy lấy Role và Permission từ Role và các Role cha
@@ -107,6 +98,10 @@ public class User extends BaseModel implements UserDetails {
         for (Role parentRole : role.getChildRoles()) {
             collectAuthoritiesFromRole(parentRole, authorities, visitedRoles);
         }
+    }
+
+    public boolean isSuperAdmin() {
+        return this.getRoles().stream().anyMatch(role -> role.getName().equalsIgnoreCase("SUPER_ADMIN"));
     }
 
     @Override

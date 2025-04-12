@@ -1,6 +1,7 @@
 package com.vuog.core.module.configuration.application.service.impl;
 
 import com.vuog.core.module.configuration.application.service.RateLimitingService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -9,7 +10,8 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class RedisRateLimitingService implements RateLimitingService {
 
-    private static final Long REQUEST_LIMIT = 10L;
+    @Value("${app.rate-limiting}")
+    private Long REQUEST_LIMIT = 10L;
     private static final Long TIME_WINDOW = 60L;
 
     private final RedisTemplate<String, Integer> redisTemplate;

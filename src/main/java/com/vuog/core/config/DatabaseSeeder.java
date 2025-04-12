@@ -34,20 +34,12 @@ public class DatabaseSeeder {
             List<String> logStoreNewEntity = new ArrayList<>();
 
             for (String entity : entities) {
-                // create role
-                String code = "MANAGE_" + entity.toUpperCase();
-
-                Role role = new Role();
-                role.setCode(code);
-                role.setName("Can manage " + entity);
-                role.setDescription("Manage " + entity);
 
                 Set<Permission> permissions = new HashSet<>();
                 for (String action : ACTIONS) {
                     String permCode = action.toUpperCase() + "_" + entity.toUpperCase();
 
-                    Optional<Permission> permissionOptional = permissionRepository.findByCode(permCode);
-                    if (permissionOptional.isEmpty()) {
+                    Permission permission = permissionRepository.findByCode(permCode).orElseGet(() -> {
                         Permission perm = initPermission(
                                 permCode,
                                 action + " " + entity + " permission",
@@ -56,19 +48,32 @@ public class DatabaseSeeder {
                         perm = permissionRepository.save(perm);
                         permissions.add(perm);
                         logStoreNewEntity.add("Store permission: " + permCode);
-                    } else {
-                        permissions.add(permissionOptional.get());
-                    }
+                        return perm;
+                    });
+
+                    permissions.add(permission);
                 }
-                role.setPermissions(permissions);
 
-                role.setCreatedBy("SYSTEM");
-                role.setUpdatedBy("SYSTEM");
+                // create role
+                String code = "MANAGE_" + entity.toUpperCase();
 
-                if (roleRepository.findByCode(code).isEmpty()) {
-                    role = roleRepository.save(role);
+                Role role = roleRepository.findByCode(code).orElseGet(() -> {
+                    Role newRole = new Role();
+                    newRole.setCode(code);
+                    newRole.setName("Can manage " + entity);
+                    newRole.setDescription("Manage " + entity);
+
+                    newRole.setPermissions(permissions);
+
+                    newRole.setCreatedBy("SYSTEM");
+                    newRole.setUpdatedBy("SYSTEM");
+
+                    newRole = roleRepository.save(newRole);
                     logStoreNewEntity.add("Store role: " + code);
-                }
+
+                    return newRole;
+                });
+
                 roles.add(role);
             }
 

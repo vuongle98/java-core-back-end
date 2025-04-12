@@ -6,6 +6,7 @@ import com.vuog.core.module.rest.infrastructure.projection.ProjectionDefinition;
 import com.vuog.core.module.rest.infrastructure.projection.ProjectionHandler;
 import com.vuog.core.module.rest.infrastructure.projection.ProjectionRegistry;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -26,17 +27,19 @@ public class LiteRestAutoConfiguration {
         return new Class<?>[]{ProjectionDefinition.class};
     }
 
-    @Bean
-    public GenericRestService liteRestService(
-            ProjectionHandler projectionHandler,
-            ProjectionRegistry projectionRegistry,
-            ObjectMapper objectMapper,
-            ApplicationContext applicationContext) {
-        return new GenericRestService(
-                projectionHandler,
-                projectionRegistry,
-                objectMapper,
-                applicationContext
-        );
-    }
+//    @Bean
+//    public GenericRestService liteRestService(
+//            ProjectionHandler projectionHandler,
+//            ProjectionRegistry projectionRegistry,
+//            ObjectMapper objectMapper,
+//            ApplicationContext applicationContext,
+//            ApplicationEventPublisher applicationEventPublisher) {
+//        return new GenericRestService(
+//                projectionHandler,
+//                projectionRegistry,
+//                objectMapper,
+//                applicationContext,
+//                applicationEventPublisher
+//        );
+//    }
 }

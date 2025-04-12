@@ -1,5 +1,6 @@
 package com.vuog.core.module.auth.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.vuog.core.common.base.BaseModel;
 import jakarta.persistence.*;
 import lombok.*;
@@ -15,7 +16,7 @@ import java.util.Set;
 @Builder
 @Entity
 @Table(name = "roles")
-@ToString
+@ToString(exclude = {"permissions", "users"})
 public class Role extends BaseModel {
 
     @Column(name = "name")
@@ -40,5 +41,20 @@ public class Role extends BaseModel {
             inverseJoinColumns = @JoinColumn(name = "child_role_id")
     )
     private Set<Role> childRoles = new HashSet<>(); // Các role con
+
+    @JsonIgnore
+    public boolean isSuperAdminRole() {
+        return "SUPER_ADMIN".equalsIgnoreCase(code);
+    }
+
+    @JsonIgnore
+    public boolean isParentOf(Role other) {
+        return this.getChildRoles().contains(other);
+    }
+
+    @JsonIgnore
+    public boolean isProtected() {
+        return isSuperAdminRole();
+    }
 
 }

@@ -1,18 +1,18 @@
-package com.vuog.core.module.logging.domain.event;
+package com.vuog.core.common.event;
 
-import com.vuog.core.common.event.DomainEvent;
-import com.vuog.core.module.logging.domain.model.AuditLog;
-import com.vuog.core.module.logging.domain.model.UserRequestLog;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+
+import java.util.Map;
 
 @Data
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class AuditLogEvent implements DomainEvent {
 
-    private AuditLog auditLog;
+    private Map<String, Object> entity;
 
     @Override
     public String eventName() {
@@ -21,7 +21,7 @@ public class AuditLogEvent implements DomainEvent {
 
     @Override
     public String toPayload() {
-        return auditLog.toString();
+        return entity.toString();
     }
 
     @Override
