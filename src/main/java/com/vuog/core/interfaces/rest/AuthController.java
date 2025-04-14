@@ -1,12 +1,15 @@
 package com.vuog.core.interfaces.rest;
 
 import com.vuog.core.common.dto.ApiResponse;
+import com.vuog.core.common.util.Context;
 import com.vuog.core.module.auth.application.command.CreateUserReq;
 import com.vuog.core.module.auth.application.command.LoginCommand;
 import com.vuog.core.module.auth.application.dto.JwtResponseDto;
 import com.vuog.core.module.auth.application.dto.UserDto;
 import com.vuog.core.module.auth.application.service.AuthService;
 import com.vuog.core.module.auth.domain.model.User;
+import io.jsonwebtoken.ExpiredJwtException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,14 +37,22 @@ public class AuthController {
     public ResponseEntity<ApiResponse<JwtResponseDto>> refresh(
             @RequestParam String token
     ) {
-        JwtResponseDto response = authService.refreshToken(token);
-        return ResponseEntity.ok(ApiResponse.success(response));
+        try {
+            Context.setSystemUser();
+            JwtResponseDto response = authService.refreshToken(token);
+            Context.clear();
+            return ResponseEntity.ok(ApiResponse.success(response));
+        } catch (ExpiredJwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED.value()).body(ApiResponse.error(e.getMessage()));
+        }
     }
 
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<String>> logout(
     ) {
+        Context.setSystemUser();
         authService.logout();
+        Context.clear();
 
         return ResponseEntity.ok(ApiResponse.success("Logout successfully"));
     }
@@ -50,8 +61,9 @@ public class AuthController {
     public ResponseEntity<ApiResponse<UserDto>> register(
             @RequestBody CreateUserReq request
     ) {
+        Context.setSystemUser();
         User response = authService.register(request);
-
+        Context.clear();
         UserDto userInfo = new UserDto(response);
         return ResponseEntity.ok(ApiResponse.success(userInfo));
     }

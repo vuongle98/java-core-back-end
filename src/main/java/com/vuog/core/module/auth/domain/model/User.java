@@ -45,6 +45,11 @@ public class User extends BaseModel implements UserDetails {
         this.username = username;
     }
 
+    public User(String username, String email) {
+        this.username = username;
+        this.email = email;
+    }
+
     public User(
             String username,
             String email,

@@ -1,10 +1,13 @@
 package com.vuog.core.config;
 
+import com.vuog.core.common.util.Context;
 import com.vuog.core.module.auth.domain.model.*;
 import com.vuog.core.module.auth.domain.repository.*;
 import com.vuog.core.module.configuration.domain.model.FeatureFlag;
 import com.vuog.core.module.configuration.domain.repository.FeatureFlagRepository;
 import org.reflections.Reflections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +18,7 @@ import java.util.*;
 @Configuration
 public class DatabaseSeeder {
 
+    private static final Logger logger = LoggerFactory.getLogger(DatabaseSeeder.class);
 
     @Bean
     CommandLineRunner initPermission(
@@ -25,7 +29,9 @@ public class DatabaseSeeder {
             UserProfileRepository profileRepository
     ) {
         return args -> {
-            System.out.println("Auto initializing permissions...");
+            logger.info("Auto initializing permissions...");
+
+            Context.setSystemUser();  // Set the default user for audit logs
 
             List<String> ACTIONS = List.of("READ", "WRITE", "DELETE");
             Set<String> entities = scanEntities("com.vuog.core.module");
@@ -41,6 +47,7 @@ public class DatabaseSeeder {
 
                     Permission permission = permissionRepository.findByCode(permCode).orElseGet(() -> {
                         Permission perm = initPermission(
+                                entity.toUpperCase(),
                                 permCode,
                                 action + " " + entity + " permission",
                                 "Can " + action + " data in " + entity
@@ -94,7 +101,7 @@ public class DatabaseSeeder {
 
 
             if (userRepository.findByUsername("admin").isEmpty()) {
-                System.out.println("Auto initializing master user...");
+                logger.info("Auto initializing master user...");
 
                 User user = new User();
                 user.setUsername("admin");
@@ -106,7 +113,6 @@ public class DatabaseSeeder {
                 user = userRepository.save(user);
 
                 logStoreNewEntity.add("Store user: " + user.getUsername());
-
 
                 if (profileRepository.findByUser(user).isEmpty()) {
                     UserProfile userProfile = new UserProfile();
@@ -121,9 +127,10 @@ public class DatabaseSeeder {
                 }
             }
 
-            logStoreNewEntity.forEach(System.out::println);
+            logStoreNewEntity.forEach(logger::info);
 
-            System.out.println("Setup permissions completed.");
+            logger.info("Setup permissions completed.");
+            Context.clear();
         };
     }
 
@@ -131,8 +138,9 @@ public class DatabaseSeeder {
     CommandLineRunner initEndpointSecurity(
             EndpointSecureRepository endpointSecureRepository
     ) {
-
         return args -> {
+
+            Context.setSystemUser();
 
             Set<String> entities = scanEntities("com.vuog.core.module");
 
@@ -175,7 +183,8 @@ public class DatabaseSeeder {
                 endpointSecureRepository.save(superRoleEndpoint);
             }
 
-            System.out.println("Added endpoint secures");
+            logger.info("Added endpoint secures");
+            Context.clear();
         };
     }
 
@@ -183,6 +192,8 @@ public class DatabaseSeeder {
     CommandLineRunner initFeature(FeatureFlagRepository featureFlagRepository) {
 
         return args -> {
+            Context.setSystemUser();  // Set the default user for audit logs
+
             featureFlagRepository.findByName("TEST").orElseGet(() -> {
                 FeatureFlag featureFlag = new FeatureFlag();
                 featureFlag.setName("TEST");
@@ -193,11 +204,15 @@ public class DatabaseSeeder {
                 featureFlag = featureFlagRepository.save(featureFlag);
                 return featureFlag;
             });
+
+            logger.info("Added feature flags");
+            Context.clear();
         };
     }
 
-    private Permission initPermission(String code, String name, String description) {
+    private Permission initPermission(String module, String code, String name, String description) {
         Permission permission = new Permission();
+        permission.setModule(module);
         permission.setCode(code);
         permission.setName(name);
         permission.setDescription(description);

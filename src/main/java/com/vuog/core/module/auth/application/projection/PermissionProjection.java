@@ -15,4 +15,6 @@ public interface PermissionProjection {
     String getDescription();
 
     String getCode();
+
+    String getModule();
 }

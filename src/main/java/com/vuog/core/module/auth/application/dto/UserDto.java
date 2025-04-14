@@ -19,6 +19,7 @@ public class UserDto extends BaseDto {
     private String email;
     private Set<String> permissions;
     private Set<String> roles;
+    private Boolean locked;
 
     public UserDto(User user) {
         this.id = user.getId();

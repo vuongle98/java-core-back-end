@@ -79,7 +79,16 @@ public class JwtUtils {
     }
 
     public String getUserNameFromJwtToken(String token) {
-        return extractClaims(token, Claims::getSubject);
+        try {
+            // Try to extract the username from the token
+            return extractClaims(token, Claims::getSubject);
+        } catch (ExpiredJwtException e) {
+            log.error("JWT token has expired: {}", e.getMessage());
+            throw e; // You may want to rethrow this or handle it as you see fit
+        } catch (Exception e) {
+            log.error("Error extracting username from token: {}", e.getMessage());
+            throw new IllegalArgumentException("Invalid JWT token");
+        }
     }
 
     public <T> T extractClaims(String token, Function<Claims, T> claimsResolver) {
@@ -101,7 +110,7 @@ public class JwtUtils {
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
 
-    private boolean isTokenExpired(String token) {
+    public boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 

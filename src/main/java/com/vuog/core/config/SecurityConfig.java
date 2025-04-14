@@ -61,9 +61,9 @@ public class SecurityConfig {
                 .httpBasic(Customizer.withDefaults());
 
         http.authenticationProvider(authenticationProvider);
-        http.addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(rateLimitingFilter, AuthTokenFilter.class);
         http.addFilterAfter(userRequestLogFilter, RateLimitingFilter.class);
-        http.addFilterBefore(authTokenFilter, UserRequestLogFilter.class);
         return http.build();
     }
 

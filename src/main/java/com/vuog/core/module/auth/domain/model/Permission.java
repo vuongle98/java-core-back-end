@@ -24,6 +24,9 @@ public class Permission extends BaseModel {
     @Column(name = "code")
     private String code;
 
+    @Column(name = "module")
+    private String module;
+
     @Column(name = "description")
     private String description;
 

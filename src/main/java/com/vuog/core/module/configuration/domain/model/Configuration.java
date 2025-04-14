@@ -19,10 +19,11 @@ public class Configuration extends BaseModel {
 
     private String key;
     private String value;
+    private String type;
     private Environment environment;
     private String description;
 
     private enum Environment {
-        DEV, PROD
+        ALL, DEV, PROD
     }
 }
