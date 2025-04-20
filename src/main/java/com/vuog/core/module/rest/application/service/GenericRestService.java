@@ -178,7 +178,7 @@ public class GenericRestService {
         }
 
         try {
-            D projectedEntity = projectionHandler.project(entity, projectionClass);
+            D projectedEntity = projectionHandler.project(entity, projectionClass, new HashSet<>());
             if (projectedEntity == null) {
                 logger.warn("Projection returned null for entity of type {} to projection type {}",
                         entity.getClass().getName(), projectionClass.getName());

@@ -34,11 +34,10 @@ public class User extends BaseModel implements UserDetails {
     private Boolean locked = false;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JsonManagedReference
     private Set<Role> roles = new HashSet<>();
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JsonBackReference
+    @JsonManagedReference
     private List<Token> tokens = new ArrayList<>();
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)

@@ -33,11 +33,9 @@ public class Role extends BaseModel {
     private String description;
 
     @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
-    @JsonBackReference
     private Set<User> users = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JsonManagedReference
     private Set<Permission> permissions = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.EAGER)

@@ -20,7 +20,7 @@ import java.time.Instant;
 public class Token extends BaseModel {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonManagedReference
+    @JsonBackReference
     private User user;
 
     private String token;

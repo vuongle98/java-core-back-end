@@ -32,6 +32,5 @@ public class Permission extends BaseModel {
     private String description;
 
     @ManyToMany(mappedBy = "permissions", fetch = FetchType.LAZY)
-    @JsonBackReference
     private Set<Role> roles = new HashSet<>();
 }
