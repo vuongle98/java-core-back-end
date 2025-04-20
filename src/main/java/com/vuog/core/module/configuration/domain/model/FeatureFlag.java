@@ -22,6 +22,7 @@ public class FeatureFlag extends BaseModel {
     private Environment environment;
     private Boolean enabled;
     private String description;
+    private String title;
 
     public enum Environment {
         DEVELOPMENT, PRODUCTION, STAGING

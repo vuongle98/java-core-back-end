@@ -15,4 +15,11 @@ public class UserDomainServiceImpl implements UserDomainService {
             throw new IllegalArgumentException("Username cannot empty");
         }
     }
+
+    @Override
+    public void validatePassword(User user, String password) {
+        if (!user.getPassword().equals(password)) {
+            throw new IllegalArgumentException("Current password does not match");
+        }
+    }
 }

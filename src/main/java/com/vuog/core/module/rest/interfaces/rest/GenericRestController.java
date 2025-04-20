@@ -36,9 +36,25 @@ public class GenericRestController<T, ID> {
     public <D> ResponseEntity<ApiResponse<Page<D>>> getAll(
             @PathVariable("entity") String entity,
             @RequestParam(required = false) String projection,
-            Pageable pageable) {
+            @RequestParam(required = false) Map<String, String> requestParams,
+            Pageable pageable
+    ) {
         try {
             List<String> validationErrors = requestValidator.validatePageable(pageable);
+
+            // Remove pageable params from filters
+            Map<String, String> filters = new java.util.HashMap<>(requestParams);
+            filters.remove("projection");
+            filters.remove("page");
+            filters.remove("size");
+            filters.remove("sort");
+
+
+            // Optionally validate filters if your validator has such a method
+            if (!filters.isEmpty()) {
+                validationErrors.addAll(requestValidator.validateFilters(filters));
+            }
+
             if (!validationErrors.isEmpty()) {
                 return ResponseEntity.badRequest()
                         .body(ApiResponse.error(String.join(", ", validationErrors)));
@@ -48,9 +64,17 @@ public class GenericRestController<T, ID> {
             Class<T> entityClass = repository.getEntityClass();
             Class<D> projectionClass = genericRestService.resolveProjectionClass(projection, entityClass);
 
-            Page<D> result = projectionClass != null
-                    ? genericRestService.findAll(repository, pageable, projectionClass)
-                    : (Page<D>) genericRestService.findAll(repository, pageable);
+            Page<D> result;
+            if (!filters.isEmpty()) {
+                result = projectionClass != null
+                        ? genericRestService.findAll(repository, filters, pageable, entityClass, projectionClass)
+                        : (Page<D>) genericRestService.findAll(repository, filters, pageable, entityClass);
+
+            } else {
+                result = projectionClass != null
+                        ? genericRestService.findAll(repository, pageable, projectionClass)
+                        : (Page<D>) genericRestService.findAll(repository, pageable);
+            }
 
             return ResponseEntity.ok(ApiResponse.success(result));
         } catch (Exception e) {
@@ -185,8 +209,8 @@ public class GenericRestController<T, ID> {
             Class<D> projectionClass = genericRestService.resolveProjectionClass(request.getProjection(), entityClass);
 
             Page<D> result = projectionClass != null
-                    ? genericRestService.findAll(repository, request.getFilters(), request.getPageable(), projectionClass)
-                    : (Page<D>) genericRestService.findAll(repository, request.getFilters(), request.getPageable());
+                    ? genericRestService.findAll(repository, request.getFilters(), request.getPageable(), entityClass, projectionClass)
+                    : (Page<D>) genericRestService.findAll(repository, request.getFilters(), request.getPageable(), entityClass);
 
             return ResponseEntity.ok(ApiResponse.success(result));
         } catch (Exception e) {

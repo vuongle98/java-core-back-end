@@ -1,5 +1,7 @@
 package com.vuog.core.module.auth.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.vuog.core.common.base.BaseModel;
 import com.vuog.core.common.listener.EntityChangeListener;
 import jakarta.persistence.*;
@@ -18,6 +20,7 @@ import java.time.Instant;
 public class Token extends BaseModel {
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonManagedReference
     private User user;
 
     private String token;
@@ -27,7 +30,7 @@ public class Token extends BaseModel {
 
     private Instant expireAt;
 
-    private Instant issuedAt;
+    private Instant issuedAt = Instant.now();
 
     @Column(name = "is_black_listed")
     private Boolean isBlacklisted;

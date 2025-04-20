@@ -15,7 +15,7 @@ public class UserCreatedEvent implements DomainEvent {
 
     @Override
     public String key() {
-        return user.getId().toString();
+        return null;
     }
 
     @Override

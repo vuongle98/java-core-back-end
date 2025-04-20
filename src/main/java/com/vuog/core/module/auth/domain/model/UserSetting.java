@@ -16,7 +16,7 @@ import lombok.*;
 @EntityListeners({EntityChangeListener.class})
 public class UserSetting extends BaseModel {
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private User user;
     private String key;
     private String value;

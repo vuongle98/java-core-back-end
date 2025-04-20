@@ -16,5 +16,5 @@ public interface RoleProjection {
 
     String getCode();
 
-    Set<PermissionProjection> getPermissions();
+//    Set<PermissionProjection> getPermissions();
 }

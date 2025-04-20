@@ -2,6 +2,10 @@ package com.vuog.core.module.auth.application.service.impl;
 
 import com.vuog.core.common.exception.UserNotFoundException;
 import com.vuog.core.module.auth.application.command.CreateUserReq;
+import com.vuog.core.module.auth.application.command.ChangePasswordCommand;
+import com.vuog.core.module.auth.application.command.UpdateProfileCommand;
+import com.vuog.core.module.auth.application.dto.UserDto;
+import com.vuog.core.module.auth.application.dto.UserProfileDto;
 import com.vuog.core.module.auth.application.query.UserQuery;
 import com.vuog.core.module.auth.application.service.UserService;
 import com.vuog.core.module.auth.application.specification.UserSpecification;
@@ -9,8 +13,12 @@ import com.vuog.core.module.auth.domain.event.UserCreatedEvent;
 import com.vuog.core.module.auth.domain.event.UserUpdatedEvent;
 import com.vuog.core.module.auth.domain.model.Role;
 import com.vuog.core.module.auth.domain.model.User;
+import com.vuog.core.module.auth.domain.model.UserProfile;
+import com.vuog.core.module.auth.domain.model.UserSetting;
 import com.vuog.core.module.auth.domain.repository.RoleRepository;
+import com.vuog.core.module.auth.domain.repository.UserProfileRepository;
 import com.vuog.core.module.auth.domain.repository.UserRepository;
+import com.vuog.core.module.auth.domain.repository.UserSettingRepository;
 import com.vuog.core.module.auth.domain.service.UserDomainService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -31,18 +39,22 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final ApplicationEventPublisher eventPublisher;
+    private final UserProfileRepository profileRepository;
+    private final UserSettingRepository userSettingRepository;
 
     public UserServiceImpl(UserDomainService userDomainService,
                            UserRepository userRepository,
                            RoleRepository roleRepository,
                            PasswordEncoder passwordEncoder,
-                           ApplicationEventPublisher eventPublisher
+                           ApplicationEventPublisher eventPublisher, UserProfileRepository profileRepository, UserSettingRepository userSettingRepository
     ) {
         this.userDomainService = userDomainService;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.eventPublisher = eventPublisher;
+        this.profileRepository = profileRepository;
+        this.userSettingRepository = userSettingRepository;
     }
 
     @Override
@@ -90,6 +102,16 @@ public class UserServiceImpl implements UserService {
 
         userDomainService.validateUser(user);
 
+        // Create and set UserProfile
+        UserProfile userProfile = new UserProfile();
+        userProfile.setUser(user);     // If you have a user field in UserProfile
+        user.setProfile(userProfile);  // If you have a profile field in User
+
+        // Create and set UserSetting
+        UserSetting userSetting = new UserSetting();
+        userSetting.setUser(user);
+        user.setSettings(userSetting); // If you have a settings field in User
+
         eventPublisher.publishEvent(new UserCreatedEvent(user));
 
         return userRepository.save(user);
@@ -121,8 +143,71 @@ public class UserServiceImpl implements UserService {
             return;
         }
 
-        User existedUser = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found."));
+        User existedUser = getById(id);
         existedUser.setIsDeleted(true);
         userRepository.save(existedUser);
+    }
+
+    @Override
+    public UserDto getProfile(Long userId) {
+        User user = getById(userId);
+
+        UserProfile userProfile = profileRepository.findByUser(user).orElseThrow(() -> new UserNotFoundException("Profile not found."));
+
+        UserDto userDto = new UserDto(user);
+        userDto.setProfile(new UserProfileDto(userProfile));
+
+        return userDto;
+    }
+
+    @Override
+    public UserDto updateProfile(Long userId, UpdateProfileCommand command) {
+        User user = getById(userId);
+
+        UserProfile userProfile = profileRepository.findByUser(user).orElseThrow(() -> new UserNotFoundException("Profile not found."));
+
+        if (Objects.nonNull(command.getAddress())) {
+            userProfile.setAddress(command.getAddress());
+        }
+
+        if (Objects.nonNull(command.getPhone())) {
+            userProfile.setPhone(command.getPhone());
+        }
+
+        if (Objects.nonNull(command.getFirstName())) {
+            userProfile.setFirstName(command.getFirstName());
+        }
+
+        if (Objects.nonNull(command.getLastName())) {
+            userProfile.setLastName(command.getLastName());
+        }
+
+        if (Objects.nonNull(command.getAvatarUrl())) {
+            userProfile.setAvatarUrl(command.getAvatarUrl());
+        }
+
+        userProfile = profileRepository.save(userProfile);
+
+        UserDto userDto = new UserDto(user);
+        userDto.setProfile(new UserProfileDto(userProfile));
+
+        return userDto;
+    }
+
+    @Override
+    public User changePassword(Long userId, ChangePasswordCommand command) {
+
+        User user = getById(userId);
+        String encodeCurrPass = passwordEncoder.encode(command.getCurrentPassword());
+        userDomainService.validatePassword(user, encodeCurrPass);
+
+        if (!command.getNewPassword().equals(command.getConfirmPassword())) {
+            throw new IllegalArgumentException("Current password and confirm password do not match.");
+        }
+
+        String newPassword = passwordEncoder.encode(command.getNewPassword());
+        user.setPassword(newPassword);
+
+        return userRepository.save(user);
     }
 }

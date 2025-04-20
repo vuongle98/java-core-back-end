@@ -21,6 +21,7 @@ public class Configuration extends BaseModel {
     private String value;
     private String type;
     private Environment environment;
+    private String title;
     private String description;
 
     private enum Environment {

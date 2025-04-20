@@ -1,5 +1,6 @@
 package com.vuog.core.module.auth.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.vuog.core.common.base.BaseModel;
 import com.vuog.core.common.listener.EntityChangeListener;
 import jakarta.persistence.*;
@@ -31,5 +32,6 @@ public class Permission extends BaseModel {
     private String description;
 
     @ManyToMany(mappedBy = "permissions", fetch = FetchType.LAZY)
+    @JsonBackReference
     private Set<Role> roles = new HashSet<>();
 }

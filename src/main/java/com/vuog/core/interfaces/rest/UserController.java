@@ -3,11 +3,13 @@ package com.vuog.core.interfaces.rest;
 import com.vuog.core.common.dto.ApiResponse;
 import com.vuog.core.common.validation.RequestValidator;
 import com.vuog.core.module.auth.application.command.CreateUserReq;
+import com.vuog.core.module.auth.application.command.ChangePasswordCommand;
+import com.vuog.core.module.auth.application.command.UpdateProfileCommand;
 import com.vuog.core.module.auth.application.dto.UserDto;
+import com.vuog.core.module.auth.application.dto.UserProfileDto;
 import com.vuog.core.module.auth.application.query.UserQuery;
 import com.vuog.core.module.auth.application.service.UserService;
 import com.vuog.core.module.auth.domain.model.User;
-import com.vuog.core.module.configuration.application.annotation.FeatureToggle;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -85,8 +87,11 @@ public class UserController {
 
             User createdUser = userService.create(createReq);
 
+            UserDto userDto = new UserDto(createdUser);
+            userDto.setProfile(new UserProfileDto(createdUser.getProfile()));
+
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(ApiResponse.success("Created successfully", new UserDto(createdUser)));
+                    .body(ApiResponse.success("Created successfully", userDto));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResponse.error("Failed to create entity: " + e.getMessage()));
@@ -110,6 +115,73 @@ public class UserController {
             User updatedUser = userService.update(id, updateReq);
 
             return ResponseEntity.ok(ApiResponse.success("Created successfully", new UserDto(updatedUser)));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Failed to create entity: " + e.getMessage()));
+        }
+    }
+
+    @GetMapping("/{id}/profile")
+    public ResponseEntity<ApiResponse<UserDto>> getProfile(
+            @PathVariable(value = "id") Long id
+    ) {
+        try {
+            List<String> validationErrors = requestValidator.validateId(id);
+
+            if (!validationErrors.isEmpty()) {
+                return ResponseEntity.badRequest()
+                        .body(ApiResponse.error(String.join(", ", validationErrors)));
+            }
+
+            UserDto updatedUser = userService.getProfile(id);
+
+            return ResponseEntity.ok(ApiResponse.success("Get profile successfully", updatedUser));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Failed to create entity: " + e.getMessage()));
+        }
+    }
+
+    @PutMapping("/{id}/profile")
+    public ResponseEntity<ApiResponse<UserDto>> updateProfile(
+            @PathVariable(value = "id") Long id,
+            @RequestBody UpdateProfileCommand command
+    ) {
+        try {
+            List<String> validationErrors = requestValidator.validateId(id);
+            validationErrors.addAll(requestValidator.validateEntity(command));
+
+            if (!validationErrors.isEmpty()) {
+                return ResponseEntity.badRequest()
+                        .body(ApiResponse.error(String.join(", ", validationErrors)));
+            }
+
+            UserDto updatedUser = userService.updateProfile(id, command);
+
+            return ResponseEntity.ok(ApiResponse.success("Update successfully", updatedUser));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Failed to create entity: " + e.getMessage()));
+        }
+    }
+
+    @PutMapping("/{id}/change-password")
+    public ResponseEntity<ApiResponse<UserDto>> changePassword(
+            @PathVariable(value = "id") Long id,
+            @RequestBody ChangePasswordCommand command
+    ) {
+        try {
+            List<String> validationErrors = requestValidator.validateId(id);
+            validationErrors.addAll(requestValidator.validateEntity(command));
+
+            if (!validationErrors.isEmpty()) {
+                return ResponseEntity.badRequest()
+                        .body(ApiResponse.error(String.join(", ", validationErrors)));
+            }
+
+            UserDto updatedUser = new UserDto(userService.changePassword(id, command));
+
+            return ResponseEntity.ok(ApiResponse.success("Change password successfully", updatedUser));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResponse.error("Failed to create entity: " + e.getMessage()));

@@ -51,4 +51,9 @@ public class RedisCacheService {
     public void removeEntityKeyFromRedis(String entityKey) {
         redisTemplate.delete(entityKey);
     }
+
+    public void removeAllKeysFromRedis() {
+        Set<String> keys = redisTemplate.keys("*");
+        redisTemplate.delete(keys);
+    }
 }

@@ -1,5 +1,7 @@
 package com.vuog.core.module.auth.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.vuog.core.common.base.BaseModel;
 import com.vuog.core.common.listener.EntityChangeListener;
 import jakarta.persistence.*;
@@ -17,7 +19,6 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Entity
 @Table(name = "users")
-@ToString(exclude = {"roles", "tokens", "profile", "password"})
 @EntityListeners(EntityChangeListener.class)
 public class User extends BaseModel implements UserDetails {
 
@@ -33,13 +34,18 @@ public class User extends BaseModel implements UserDetails {
     private Boolean locked = false;
 
     @ManyToMany(fetch = FetchType.EAGER)
+    @JsonManagedReference
     private Set<Role> roles = new HashSet<>();
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonBackReference
     private List<Token> tokens = new ArrayList<>();
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private UserProfile profile;
+
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private UserSetting settings;
 
     public User(String username) {
         this.username = username;

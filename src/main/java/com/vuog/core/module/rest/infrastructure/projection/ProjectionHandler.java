@@ -2,7 +2,10 @@ package com.vuog.core.module.rest.infrastructure.projection;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.hibernate5.jakarta.Hibernate5JakartaModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -648,7 +651,15 @@ public class ProjectionHandler {
 
         private boolean deepEquals(Object o1, Object o2) {
             try {
-                ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
+                ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule())
+                        .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
+                        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+                // Add Hibernate5Module to handle Hibernate proxies
+                mapper.registerModule(new Hibernate5JakartaModule()
+                        .configure(Hibernate5JakartaModule.Feature.FORCE_LAZY_LOADING, false)
+                        .configure(Hibernate5JakartaModule.Feature.SERIALIZE_IDENTIFIER_FOR_LAZY_NOT_LOADED_OBJECTS, true));
+
                 String json1 = mapper.writeValueAsString(o1);
                 String json2 = mapper.writeValueAsString(o2);
                 return json1.equals(json2);

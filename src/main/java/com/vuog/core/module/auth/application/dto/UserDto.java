@@ -6,6 +6,7 @@ import com.vuog.core.module.auth.domain.model.Role;
 import com.vuog.core.module.auth.domain.model.User;
 import lombok.*;
 
+import java.time.Instant;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -20,6 +21,10 @@ public class UserDto extends BaseDto {
     private Set<String> permissions;
     private Set<String> roles;
     private Boolean locked;
+    private Instant createdAt;
+    private Instant updatedAt;
+
+    private UserProfileDto profile;
 
     public UserDto(User user) {
         this.id = user.getId();
@@ -27,6 +32,8 @@ public class UserDto extends BaseDto {
         this.email = user.getEmail();
         this.roles = user.getRoles().stream().map(Role::getCode).collect(Collectors.toSet());
         this.permissions = user.getRoles().stream().flatMap(role -> role.getPermissions().stream().map(Permission::getCode)).collect(Collectors.toSet());
+        this.createdAt = user.getCreatedAt();
+        this.updatedAt = user.getUpdatedAt();
     }
 
     public UserDto(String username) {

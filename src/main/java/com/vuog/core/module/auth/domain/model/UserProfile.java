@@ -15,7 +15,7 @@ import lombok.*;
 @EntityListeners(EntityChangeListener.class)
 public class UserProfile extends BaseModel {
 
-    @OneToOne(mappedBy = "profile")
+    @OneToOne(mappedBy = "profile", cascade = CascadeType.ALL)
     private User user;
 
     @Column(name = "first_name")

@@ -61,13 +61,14 @@ class GenericRestControllerTest {
         PageRequest pageable = PageRequest.of(0, 10);
         List<Object> content = Arrays.asList(new Object(), new Object());
         Page<Object> page = new PageImpl<>(content, pageable, content.size());
+        Map<String, String> filters = new HashMap<>();
         
         when(requestValidator.validatePageable(any())).thenReturn(List.of());
         when(genericRestService.getJpaRepository(ENTITY_NAME)).thenReturn(repository);
         when(genericRestService.findAll(any(), any())).thenReturn(page);
 
         // Act
-        ResponseEntity<ApiResponse<Page<Object>>> response = controller.getAll(ENTITY_NAME, null, pageable);
+        ResponseEntity<ApiResponse<Page<Object>>> response = controller.getAll(ENTITY_NAME, null, filters, pageable);
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -159,7 +160,7 @@ class GenericRestControllerTest {
         when(requestValidator.validateFilters(any())).thenReturn(new ArrayList<>());
         when(requestValidator.validatePageable(any())).thenReturn(new ArrayList<>());
         when(genericRestService.getJpaRepository(ENTITY_NAME)).thenReturn(repository);
-        when(genericRestService.findAll(repository, new HashMap<>(), pageable)).thenReturn(page);
+        when(genericRestService.findAll(repository, new HashMap<>(), pageable, null)).thenReturn(page);
 
         // Act
         ResponseEntity<ApiResponse<Page<Object>>> response = controller.searchWithFilters(ENTITY_NAME, request);

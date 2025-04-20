@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vuog.core.common.exception.DataNotFoundException;
 import com.vuog.core.common.util.ObjectMappingUtil;
 import com.vuog.core.module.rest.domain.repository.GenericRepository;
-import com.vuog.core.module.rest.domain.repository.SpecificationBuilder;
+import com.vuog.core.module.rest.domain.specification.SpecificationBuilder;
 import com.vuog.core.module.rest.infrastructure.projection.ProjectionHandler;
 import com.vuog.core.module.rest.infrastructure.projection.ProjectionRegistry;
 import jakarta.persistence.ManyToMany;
@@ -53,6 +53,10 @@ public class GenericRestService {
         return applicationContext.getBean(repositoryBeanName, GenericRepository.class);
     }
 
+    public <T, ID> Class<T> getEntityClass(GenericRepository<T, ID> repository) {
+        return repository.getEntityClass();
+    }
+
     public <T, ID> Page<T> findAll(GenericRepository<T, ID> repository, Pageable pageable) {
         return repository.findAll(pageable);
     }
@@ -89,13 +93,25 @@ public class GenericRestService {
                 .collect(Collectors.toList());
     }
 
-    public <T> Page<T> findAll(JpaSpecificationExecutor<T> repository, Map<String, String> filters, Pageable pageable) {
-        Specification<T> spec = SpecificationBuilder.build(filters);
+    public <T> Page<T> findAll(
+            JpaSpecificationExecutor<T> repository,
+            Map<String, String> filters,
+            Pageable pageable,
+            Class<T> entityClass
+    ) {
+        Specification<T> spec = SpecificationBuilder.build(filters, entityClass);
         return repository.findAll(spec, pageable);
     }
 
-    public <T, D> Page<D> findAll(JpaSpecificationExecutor<T> repository, Map<String, String> filters, Pageable pageable, Class<D> projectionClass) {
-        Specification<T> spec = SpecificationBuilder.build(filters);
+    public <T, D> Page<D> findAll(
+            JpaSpecificationExecutor<T> repository,
+            Map<String, String> filters,
+            Pageable pageable,
+            Class<T> entityClass,
+            Class<D> projectionClass
+    ) {
+
+        Specification<T> spec = SpecificationBuilder.build(filters, entityClass);
         Page<T> page = repository.findAll(spec, pageable);
         return page.map(entity -> projectWithNested(entity, projectionClass));
     }
@@ -120,7 +136,7 @@ public class GenericRestService {
                     return getById(repository, entityId, projectionClass);
                 }
             } catch (Exception e) {
-                // If projection fails, return the full entity
+                // If the projection fails, return the full entity
                 return (D) savedEntity;
             }
         }
@@ -138,7 +154,7 @@ public class GenericRestService {
             try {
                 return getById(repository, id, projectionClass);
             } catch (Exception e) {
-                // If projection fails, return the full entity
+                // If the projection fails, return the full entity
                 return (D) savedEntity;
             }
         }
@@ -173,7 +189,7 @@ public class GenericRestService {
         } catch (Exception e) {
             logger.error("Failed to project entity of type {} to projection type {}: {}",
                     entity.getClass().getName(), projectionClass.getName(), e.getMessage());
-            // If projection fails, return the original entity
+            // If the projection fails, return the original entity
             return (D) entity;
         }
     }
