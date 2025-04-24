@@ -18,8 +18,8 @@ import java.util.stream.Collectors;
 public class UserDto extends BaseDto {
     private String username;
     private String email;
-    private Set<String> permissions;
-    private Set<String> roles;
+    private Set<RoleDto> roles;
+    private Set<PermissionDto> permissions;
     private Boolean locked;
     private Instant createdAt;
     private Instant updatedAt;
@@ -30,8 +30,8 @@ public class UserDto extends BaseDto {
         this.id = user.getId();
         this.username = user.getUsername();
         this.email = user.getEmail();
-        this.roles = user.getRoles().stream().map(Role::getCode).collect(Collectors.toSet());
-        this.permissions = user.getRoles().stream().flatMap(role -> role.getPermissions().stream().map(Permission::getCode)).collect(Collectors.toSet());
+        this.roles = user.getRoles().stream().map(RoleDto::new).collect(Collectors.toSet());
+        this.permissions = user.getRoles().stream().flatMap(role -> role.getPermissions().stream().map(PermissionDto::new)).collect(Collectors.toSet());
         this.createdAt = user.getCreatedAt();
         this.updatedAt = user.getUpdatedAt();
     }
