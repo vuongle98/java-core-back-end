@@ -33,7 +33,7 @@ public class Token extends BaseModel {
     private Instant issuedAt = Instant.now();
 
     @Column(name = "is_black_listed")
-    private Boolean isBlacklisted;
+    private Boolean isBlacklisted = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Token relatedToken;

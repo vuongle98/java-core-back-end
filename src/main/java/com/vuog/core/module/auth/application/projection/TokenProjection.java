@@ -1,12 +1,13 @@
 package com.vuog.core.module.auth.application.projection;
 
+import com.vuog.core.common.base.BaseProjection;
 import com.vuog.core.module.auth.domain.model.Token;
 import com.vuog.core.module.rest.infrastructure.projection.ProjectionDefinition;
 
 import java.time.Instant;
 
 @ProjectionDefinition(name = "tokenProjection", types = {Token.class})
-public interface TokenProjection {
+public interface TokenProjection extends BaseProjection {
 
     Long getId();
     UserProjection getUser();

@@ -7,6 +7,8 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
 import lombok.*;
 
+import java.io.Serializable;
+
 @Setter
 @Getter
 @AllArgsConstructor
@@ -15,7 +17,7 @@ import lombok.*;
 @Table(name = "feature_flags")
 @ToString
 @EntityListeners({EntityChangeListener.class})
-public class FeatureFlag extends BaseModel {
+public class FeatureFlag extends BaseModel implements Serializable {
 
     private String name;
     private String value;

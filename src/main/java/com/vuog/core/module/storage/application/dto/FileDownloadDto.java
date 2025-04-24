@@ -7,10 +7,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.core.io.Resource;
 
+import java.io.Serializable;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class FileDownloadDto {
+public class FileDownloadDto implements Serializable {
 
     private Resource fileResource;
     private File fileInfo;

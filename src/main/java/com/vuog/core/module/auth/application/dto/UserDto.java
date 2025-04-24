@@ -6,6 +6,7 @@ import com.vuog.core.module.auth.domain.model.Role;
 import com.vuog.core.module.auth.domain.model.User;
 import lombok.*;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class UserDto extends BaseDto {
+public class UserDto extends BaseDto implements Serializable {
     private String username;
     private String email;
     private Set<RoleDto> roles;
@@ -27,7 +28,7 @@ public class UserDto extends BaseDto {
     private UserProfileDto profile;
 
     public UserDto(User user) {
-        this.id = user.getId();
+        this.setId(user.getId());
         this.username = user.getUsername();
         this.email = user.getEmail();
         this.roles = user.getRoles().stream().map(RoleDto::new).collect(Collectors.toSet());

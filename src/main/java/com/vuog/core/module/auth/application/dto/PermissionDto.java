@@ -1,16 +1,16 @@
 package com.vuog.core.module.auth.application.dto;
 
+import com.vuog.core.common.base.BaseDto;
 import com.vuog.core.module.auth.domain.model.Permission;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serializable;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PermissionDto implements Serializable {
+public class PermissionDto extends BaseDto implements Serializable {
 
     private Long id;
     private String code;

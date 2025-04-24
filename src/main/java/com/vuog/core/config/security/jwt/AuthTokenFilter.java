@@ -4,7 +4,6 @@ import com.vuog.core.common.util.Context;
 import com.vuog.core.common.util.JwtUtils;
 import com.vuog.core.module.auth.application.service.TokenService;
 import com.vuog.core.module.auth.domain.model.Token;
-import com.vuog.core.module.auth.domain.model.User;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -55,7 +54,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
                     if (jwtUtils.isTokenExpired(jwt)) {
                         Context.setSystemUser();  // Set the default user for audit logs
-                        tokenService.blacklist(jwt);
+                        tokenService.blacklistTokenAndRelated(jwt);
                         Context.clear();
                         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token has expired");
                         return;
@@ -74,7 +73,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         } catch (ExpiredJwtException e) {
             // If the token is expired, return 401 Unauthorized
             Context.setSystemUser();  // Set the default user for audit logs
-            tokenService.blacklist(jwt);
+            tokenService.blacklistTokenAndRelated(jwt);
             Context.clear();
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token has expired");
             return;

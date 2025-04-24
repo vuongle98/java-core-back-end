@@ -45,6 +45,8 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/api/auth/logout")).authenticated()
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/api/auth/revoke")).authenticated()
                         .requestMatchers(
                                 AntPathRequestMatcher.antMatcher("/api/auth/**"),
                                 AntPathRequestMatcher.antMatcher("/v3/api-docs/**"),

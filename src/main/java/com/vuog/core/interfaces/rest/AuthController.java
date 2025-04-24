@@ -47,12 +47,19 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/revoke")
+    public ResponseEntity<ApiResponse<String>> revoke(
+            @RequestParam String token
+    ) {
+        authService.revoke(token);
+
+        return ResponseEntity.ok(ApiResponse.success("Revoke successfully"));
+    }
+
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<String>> logout(
     ) {
-        Context.setSystemUser();
         authService.logout();
-        Context.clear();
 
         return ResponseEntity.ok(ApiResponse.success("Logout successfully"));
     }
@@ -76,5 +83,11 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.success(userInfo));
     }
 
-
+    @PostMapping("/{id}/block")
+    public ResponseEntity<ApiResponse<String>> block(
+            @PathVariable Long id
+    ) {
+        authService.block(id);
+        return ResponseEntity.ok(ApiResponse.success("Block successfully"));
+    }
 }

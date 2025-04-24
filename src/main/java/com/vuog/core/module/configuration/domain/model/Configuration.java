@@ -7,6 +7,8 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
 import lombok.*;
 
+import java.io.Serializable;
+
 @Setter
 @Getter
 @AllArgsConstructor
@@ -15,7 +17,7 @@ import lombok.*;
 @Table(name = "configurations")
 @ToString
 @EntityListeners(EntityChangeListener.class)
-public class Configuration extends BaseModel {
+public class Configuration extends BaseModel implements Serializable {
 
     private String key;
     private String value;

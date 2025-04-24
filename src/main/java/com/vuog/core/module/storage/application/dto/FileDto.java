@@ -1,15 +1,15 @@
 package com.vuog.core.module.storage.application.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.vuog.core.common.base.BaseDto;
+import lombok.*;
 
 import java.io.Serializable;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class FileDto implements Serializable {
+public class FileDto extends BaseDto implements Serializable {
 
     private Long id;
     private String name;

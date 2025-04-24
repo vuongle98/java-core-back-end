@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.ArrayList;
 
 @Service
 @Transactional
@@ -55,13 +56,39 @@ public class TokenServiceImpl implements TokenService {
         return tokenRepository.existsByTokenAndIsBlacklisted(token, true);
     }
 
-    public void blacklist(String tokenStr) {
-        List<Token> tokens = tokenRepository.findAllByToken(tokenStr);
+@Transactional
+public void blacklistTokenAndRelated(String tokenStr) {
+    Instant now = Instant.now();
 
-        for (Token token : tokens) {
-            token.setIsBlacklisted(true);
-            tokenRepository.save(token);
-        }
+    // Find main tokens
+    List<Token> tokens = tokenRepository.findAllByTokenAndIsBlacklistedFalse(tokenStr);
+
+    // Collect all related tokens, including the main ones
+    List<Token> allTokensToBlacklist = new ArrayList<>(tokens);
+
+    for (Token token : tokens) {
+        List<Token> relatedTokens = tokenRepository.findAllRelatedByTokenAndIsBlacklistedFalseOrderByExpireAtDesc(token.getToken());
+        allTokensToBlacklist.addAll(relatedTokens);
+    }
+
+    // Set status and expiration
+    for (Token token : allTokensToBlacklist) {
+        token.setIsBlacklisted(true);
+        token.setExpireAt(now);
+    }
+
+    // Batch save for efficiency
+    tokenRepository.saveAll(allTokensToBlacklist);
+}
+
+    @Override
+    public void blacklistToken(String token) {
+        Token storedToken = tokenRepository.findByTokenAndIsBlacklistedFalse(token).orElseThrow(() -> new IllegalArgumentException("Token not found"));
+
+        storedToken.setIsBlacklisted(true);
+        storedToken.setExpireAt(Instant.now());
+
+        tokenRepository.save(storedToken);
     }
 
     @Override
@@ -78,6 +105,11 @@ public class TokenServiceImpl implements TokenService {
     public boolean checkTokenType(String token, Token.TokenType tokenType) {
 //        Optional<Token> tokenOptional = tokenRepository.findFirstByUserAndIsBlacklistedFalseAndExpireAtAfterAndTypeAndTokenOrderByExpireAtDesc()
         return true;
+    }
+
+    @Override
+    public Optional<Token> findValidByToken(String token) {
+        return tokenRepository.findFirstByTokenAndIsBlacklistedFalseOrderByExpireAtDesc(token);
     }
 
 }

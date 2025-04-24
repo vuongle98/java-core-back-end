@@ -6,6 +6,8 @@ import com.vuog.core.module.auth.domain.model.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -14,7 +16,7 @@ import lombok.*;
 @Table(name = "files")
 @ToString
 @EntityListeners(EntityChangeListener.class)
-public class File extends BaseModel {
+public class File extends BaseModel implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;

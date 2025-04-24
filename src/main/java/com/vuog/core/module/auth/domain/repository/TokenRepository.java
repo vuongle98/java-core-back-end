@@ -12,9 +12,13 @@ import java.util.Optional;
 public interface TokenRepository extends
         BaseRepository<Token>, BaseQueryRepository<Token> {
 
-    Optional<Token> findByToken(String token);
+    Optional<Token> findByTokenAndIsBlacklistedFalse(String token);
 
-    List<Token> findAllByToken(String token);
+    List<Token> findAllByTokenAndIsBlacklistedFalse(String token);
+
+    List<Token> findAllRelatedByTokenAndIsBlacklistedFalseOrderByExpireAtDesc(String token);
+
+    Optional<Token> findFirstByTokenAndIsBlacklistedFalseOrderByExpireAtDesc(String token);
 
     Optional<Token> findFirstByUserAndIsBlacklistedFalseAndExpireAtAfterAndTypeAndTokenOrderByExpireAtDesc(User user, Instant expiredAt, Token.TokenType type, String token);
 

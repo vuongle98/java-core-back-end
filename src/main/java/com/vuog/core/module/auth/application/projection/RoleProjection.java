@@ -6,7 +6,7 @@ import com.vuog.core.module.auth.domain.model.Role;
 import java.util.Set;
 
 @ProjectionDefinition(name = "roleProjection", types = {Role.class})
-public interface RoleProjection {
+public interface RoleProjection extends PermissionProjection {
 
     Long getId();
 

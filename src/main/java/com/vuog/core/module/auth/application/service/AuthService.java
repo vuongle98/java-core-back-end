@@ -16,4 +16,8 @@ public interface AuthService {
     User verify();
 
     void logout();
+
+    void revoke(String token);
+
+    void block(Long userId);
 }

@@ -140,7 +140,24 @@ public class AuthServiceImpl implements AuthService {
     public void logout() {
         User user = Context.getUser();
         List<Token> tokens = tokenService.findAllByUser(user);
-        tokens.forEach(token -> tokenService.blacklist(token.getToken()));
+        tokens.forEach(token -> tokenService.blacklistTokenAndRelated(token.getToken()));
+    }
+
+    @Override
+    public void revoke(String token) {
+        token = token.replace("Bearer ", "").trim();
+        Token storedToken = tokenService.findValidByToken(token)
+                .orElseThrow(() -> new UserNotFoundException("Invalid token"));
+
+        tokenService.blacklistToken(storedToken.getToken());
+    }
+
+    @Override
+    public void block(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found."));
+
+        user.setLocked(!user.getLocked());
+        userRepository.save(user);
     }
 
     // ================== PRIVATE METHODS ===================

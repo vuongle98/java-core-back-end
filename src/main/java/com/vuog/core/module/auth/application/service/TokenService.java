@@ -15,11 +15,15 @@ public interface TokenService {
 
     boolean isTokenBlacklisted(String token);
 
-    void blacklist(String token);
+    void blacklistTokenAndRelated(String token);
+
+    void blacklistToken(String token);
 
     List<Token> findAllByUser(User user);
 
     Optional<Token> findValidByTokenAndUser(String token, User user);
+
+    Optional<Token> findValidByToken(String token);
 
     boolean checkTokenType(String token, Token.TokenType tokenType);
 }
