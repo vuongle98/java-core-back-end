@@ -12,4 +12,6 @@ public interface ConfigurationProjection extends BaseProjection {
     String getValue();
     String getDescription();
     String getEnvironment();
+    String getCategory();
+    String getService();
 }

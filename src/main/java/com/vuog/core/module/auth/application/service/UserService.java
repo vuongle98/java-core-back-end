@@ -4,6 +4,7 @@ import com.vuog.core.common.base.BaseQueryService;
 import com.vuog.core.common.base.BaseService;
 import com.vuog.core.module.auth.application.command.CreateUserReq;
 import com.vuog.core.module.auth.application.command.ChangePasswordCommand;
+import com.vuog.core.module.auth.application.command.ResetPasswordCommand;
 import com.vuog.core.module.auth.application.command.UpdateProfileCommand;
 import com.vuog.core.module.auth.application.dto.UserDto;
 import com.vuog.core.module.auth.application.query.UserQuery;
@@ -17,5 +18,11 @@ public interface UserService extends
 
     UserDto getProfile(Long userId);
 
+    UserDto initProfile(Long userId);
+
     User changePassword(Long userId, ChangePasswordCommand command);
+
+    void block(Long userId);
+
+    void resetPassword(Long userId, ResetPasswordCommand command);
 }

@@ -6,4 +6,6 @@ public interface UserDomainService {
     void validateUser(User user);
 
     void validatePassword(User user, String password);
+
+    void validateEmail(User user, String email);
 }

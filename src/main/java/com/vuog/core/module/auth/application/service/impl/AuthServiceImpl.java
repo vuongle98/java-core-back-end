@@ -152,14 +152,6 @@ public class AuthServiceImpl implements AuthService {
         tokenService.blacklistToken(storedToken.getToken());
     }
 
-    @Override
-    public void block(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found."));
-
-        user.setLocked(!user.getLocked());
-        userRepository.save(user);
-    }
-
     // ================== PRIVATE METHODS ===================
 
     private String createAndSaveAccessToken(Authentication authentication, User user) {

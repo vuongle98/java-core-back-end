@@ -82,12 +82,4 @@ public class AuthController {
         UserDto userInfo = new UserDto(response);
         return ResponseEntity.ok(ApiResponse.success(userInfo));
     }
-
-    @PostMapping("/{id}/block")
-    public ResponseEntity<ApiResponse<String>> block(
-            @PathVariable Long id
-    ) {
-        authService.block(id);
-        return ResponseEntity.ok(ApiResponse.success("Block successfully"));
-    }
 }

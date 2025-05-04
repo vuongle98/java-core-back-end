@@ -18,6 +18,4 @@ public interface AuthService {
     void logout();
 
     void revoke(String token);
-
-    void block(Long userId);
 }

@@ -3,6 +3,7 @@ package com.vuog.core.module.auth.application.service.impl;
 import com.vuog.core.common.exception.UserNotFoundException;
 import com.vuog.core.module.auth.application.command.CreateUserReq;
 import com.vuog.core.module.auth.application.command.ChangePasswordCommand;
+import com.vuog.core.module.auth.application.command.ResetPasswordCommand;
 import com.vuog.core.module.auth.application.command.UpdateProfileCommand;
 import com.vuog.core.module.auth.application.dto.UserDto;
 import com.vuog.core.module.auth.application.dto.UserProfileDto;
@@ -20,6 +21,7 @@ import com.vuog.core.module.auth.domain.repository.UserProfileRepository;
 import com.vuog.core.module.auth.domain.repository.UserRepository;
 import com.vuog.core.module.auth.domain.repository.UserSettingRepository;
 import com.vuog.core.module.auth.domain.service.UserDomainService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,11 +44,17 @@ public class UserServiceImpl implements UserService {
     private final UserProfileRepository profileRepository;
     private final UserSettingRepository userSettingRepository;
 
+
+    @Value("${app.user.default.password}")
+    private String DEFAULT_PASSWORD;
+
     public UserServiceImpl(UserDomainService userDomainService,
                            UserRepository userRepository,
                            RoleRepository roleRepository,
                            PasswordEncoder passwordEncoder,
-                           ApplicationEventPublisher eventPublisher, UserProfileRepository profileRepository, UserSettingRepository userSettingRepository
+                           ApplicationEventPublisher eventPublisher,
+                           UserProfileRepository profileRepository,
+                           UserSettingRepository userSettingRepository
     ) {
         this.userDomainService = userDomainService;
         this.userRepository = userRepository;
@@ -161,6 +169,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserDto initProfile(Long userId) {
+        User user = getById(userId);
+
+        UserProfile userProfile = new UserProfile();
+        userProfile.setUser(user);
+        userProfile = profileRepository.save(userProfile);
+
+        user.setProfile(userProfile);
+        userRepository.save(user);
+
+        UserDto userDto = new UserDto(user);
+        userDto.setProfile(new UserProfileDto(userProfile));
+
+        return userDto;
+    }
+
+    @Override
     public UserDto updateProfile(Long userId, UpdateProfileCommand command) {
         User user = getById(userId);
 
@@ -209,5 +234,23 @@ public class UserServiceImpl implements UserService {
         user.setPassword(newPassword);
 
         return userRepository.save(user);
+    }
+
+    @Override
+    public void block(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found."));
+
+        user.setLocked(!user.getLocked());
+        userRepository.save(user);
+    }
+
+    @Override
+    public void resetPassword(Long userId, ResetPasswordCommand command) {
+        User user = getById(userId);
+
+        userDomainService.validateEmail(user, command.getEmail());
+
+        user.setPassword(passwordEncoder.encode(DEFAULT_PASSWORD));
+        userRepository.save(user);
     }
 }

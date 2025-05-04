@@ -16,8 +16,8 @@ public abstract class BaseDto implements Serializable {
 
     private Long id;
 
-    private Instant createdBy;
-    private Instant updatedBy;
+    private String createdBy;
+    private String updatedBy;
     private Instant createdAt;
     private Instant updatedAt;
 }

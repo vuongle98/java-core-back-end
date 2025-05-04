@@ -4,6 +4,7 @@ import com.vuog.core.common.dto.ApiResponse;
 import com.vuog.core.common.validation.RequestValidator;
 import com.vuog.core.module.auth.application.command.CreateUserReq;
 import com.vuog.core.module.auth.application.command.ChangePasswordCommand;
+import com.vuog.core.module.auth.application.command.ResetPasswordCommand;
 import com.vuog.core.module.auth.application.command.UpdateProfileCommand;
 import com.vuog.core.module.auth.application.dto.UserDto;
 import com.vuog.core.module.auth.application.dto.UserProfileDto;
@@ -133,9 +134,13 @@ public class UserController {
                         .body(ApiResponse.error(String.join(", ", validationErrors)));
             }
 
-            UserDto updatedUser = userService.getProfile(id);
+            UserDto userProfile = userService.getProfile(id);
 
-            return ResponseEntity.ok(ApiResponse.success("Get profile successfully", updatedUser));
+            if (userProfile == null) {
+                userProfile = userService.initProfile(id);
+            }
+
+            return ResponseEntity.ok(ApiResponse.success("Get profile successfully", userProfile));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResponse.error("Failed to create entity: " + e.getMessage()));
@@ -186,6 +191,24 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResponse.error("Failed to create entity: " + e.getMessage()));
         }
+    }
+
+    @PostMapping("/{id}/reset-password")
+    public ResponseEntity<ApiResponse<String>> resetPassword(
+            @PathVariable Long id,
+            @RequestBody ResetPasswordCommand command
+    ) {
+        userService.resetPassword(id, command);
+
+        return ResponseEntity.ok(ApiResponse.success("Reset password successfully"));
+    }
+
+    @PostMapping("/{id}/block")
+    public ResponseEntity<ApiResponse<String>> block(
+            @PathVariable Long id
+    ) {
+        userService.block(id);
+        return ResponseEntity.ok(ApiResponse.success("Block successfully"));
     }
 
 }

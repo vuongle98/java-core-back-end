@@ -1,8 +1,14 @@
 package com.vuog.core.module.configuration.application.service;
 
-import com.vuog.core.module.configuration.domain.model.Configuration;
+import com.vuog.core.module.configuration.application.command.CreateConfigurationCommand;
+import com.vuog.core.module.configuration.application.dto.ConfigurationDto;
+import com.vuog.core.module.configuration.application.query.ConfigurationQuery;
+
+import java.util.List;
 
 public interface ConfigurationService {
 
-    Configuration getSystemConfiguration();
+    ConfigurationDto create(CreateConfigurationCommand command);
+
+    List<ConfigurationDto> getSystemConfiguration(ConfigurationQuery query);
 }

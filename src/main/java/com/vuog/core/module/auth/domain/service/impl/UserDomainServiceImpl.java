@@ -22,4 +22,11 @@ public class UserDomainServiceImpl implements UserDomainService {
             throw new IllegalArgumentException("Current password does not match");
         }
     }
+
+    @Override
+    public void validateEmail(User user, String email) {
+        if (!user.getEmail().equals(email)) {
+            throw new IllegalArgumentException("Current email does not match");
+        }
+    }
 }

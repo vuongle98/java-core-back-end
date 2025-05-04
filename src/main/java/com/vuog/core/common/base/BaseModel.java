@@ -25,14 +25,14 @@ public abstract class BaseModel implements Serializable {
     private String updatedBy;
 
     @Column(name = "created_at")
-    private Instant createdAt;
+    private Instant createdAt = Instant.now();
 
     @Column(name = "updated_at")
-    private Instant updatedAt;
+    private Instant updatedAt = Instant.now();
 
     @Column(name = "is_deleted")
-    private Boolean isDeleted;
+    private Boolean isDeleted = false;
 
     @Column(name = "is_active")
-    private Boolean isActive;
+    private Boolean isActive = true;
 }
