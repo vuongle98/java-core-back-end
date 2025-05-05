@@ -66,8 +66,10 @@ public class UserController {
             }
 
             User user = userService.getById(id);
+            UserDto userDto = new UserDto(user);
+            userDto.setProfile(new UserProfileDto(user.getProfile()));
 
-            return ResponseEntity.ok(ApiResponse.success(new UserDto(user)));
+            return ResponseEntity.ok(ApiResponse.success(userDto));
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
