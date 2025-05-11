@@ -20,4 +20,20 @@ public class LocalFeatureToggleService implements FeatureToggleService {
         Optional<FeatureFlag> feature = repository.findByName(featureName);
         return feature.isPresent() && feature.get().getEnabled();
     }
+
+    public boolean isFeatureEnabled(Long id) {
+        Optional<FeatureFlag> feature = repository.findById(id);
+        return feature.isPresent() && feature.get().getEnabled();
+    }
+
+    public FeatureFlag toggleFeature(Long id) {
+        Optional<FeatureFlag> feature = repository.findById(id);
+        if (feature.isPresent()) {
+            FeatureFlag flag = feature.get();
+            flag.setEnabled(!flag.getEnabled());
+            return repository.save(flag);
+        } else {
+            return null;
+        }
+    }
 }

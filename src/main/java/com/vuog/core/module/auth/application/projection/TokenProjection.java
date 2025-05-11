@@ -15,5 +15,5 @@ public interface TokenProjection extends BaseProjection {
     Token.TokenType getType();
     Instant getExpireAt();
     Instant getIssuedAt();
-    Boolean isBlacklisted();
+    Boolean getIsBlacklisted();
 }

@@ -200,7 +200,7 @@ public class DatabaseSeeder {
                 featureFlag.setEnabled(true);
                 featureFlag.setValue("TEST value");
                 featureFlag.setDescription("TEST description");
-                featureFlag.setEnvironment(FeatureFlag.Environment.DEVELOPMENT);
+                featureFlag.setEnvironment(FeatureFlag.Environment.ALL);
                 featureFlag = featureFlagRepository.save(featureFlag);
                 return featureFlag;
             });

@@ -10,6 +10,8 @@ public interface FeatureFlagProjection extends BaseProjection {
     Long getId();
     String getName();
     String getValue();
+    String getType();
     String getDescription();
     Boolean getEnabled();
+    String getEnvironment();
 }

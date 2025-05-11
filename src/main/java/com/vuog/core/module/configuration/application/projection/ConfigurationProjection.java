@@ -10,6 +10,7 @@ public interface ConfigurationProjection extends BaseProjection {
     Long getId();
     String getKey();
     String getValue();
+    String getType();
     String getDescription();
     String getEnvironment();
     String getCategory();
