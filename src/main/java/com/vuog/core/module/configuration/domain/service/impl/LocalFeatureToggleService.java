@@ -36,4 +36,9 @@ public class LocalFeatureToggleService implements FeatureToggleService {
             return null;
         }
     }
+
+    public FeatureFlag getByKey(String key) {
+        Optional<FeatureFlag> feature = repository.findByName(key);
+        return feature.orElseThrow(() -> new IllegalArgumentException("Feature not found"));
+    }
 }

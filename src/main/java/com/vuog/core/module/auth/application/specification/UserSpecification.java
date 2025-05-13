@@ -22,6 +22,18 @@ public class UserSpecification {
                 predicates.add(criteriaBuilder.equal(root.get("id"), userQuery.getId()));
             }
 
+            if (Objects.nonNull(userQuery.getSearch())) {
+                predicates.add(criteriaBuilder.or(
+                                criteriaBuilder.like(root.get("username"), "%" + userQuery.getSearch() + "%"),
+                                criteriaBuilder.like(root.get("email"), "%" + userQuery.getSearch() + "%")
+                            )
+                );
+            }
+
+            if (Objects.nonNull(userQuery.getRolesIds())) {
+                predicates.add(root.get("roles").get("id").in(userQuery.getRolesIds()));
+            }
+
             if (StringUtils.hasText(userQuery.getUsername())) {
                 predicates.add(criteriaBuilder.like(root.get("username"), "%" + userQuery.getUsername() + "%"));
             }
@@ -31,7 +43,11 @@ public class UserSpecification {
             }
 
             if (StringUtils.hasText(userQuery.getRole())) {
-                predicates.add(criteriaBuilder.like(root.get("role"), "%" + userQuery.getRole() + "%"));
+                predicates.add(criteriaBuilder.or(
+                        criteriaBuilder.like(root.get("roles").get("code"), "%" + userQuery.getRole() + "%"),
+                        criteriaBuilder.like(root.get("roles").get("name"), "%" + userQuery.getRole() + "%")
+                        )
+                );
             }
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

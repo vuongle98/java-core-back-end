@@ -15,6 +15,15 @@ public class FeatureFlagController {
 
     private final LocalFeatureToggleService featureToggleService;
 
+    @GetMapping("/{key}")
+    public ResponseEntity<ApiResponse<FeatureFlagDto>> getFeatureFlag(
+            @PathVariable String key
+    ) {
+        FeatureFlag featureFlag = featureToggleService.getByKey(key);
+
+        return ResponseEntity.ok(ApiResponse.success(new FeatureFlagDto(featureFlag)));
+    }
+
     @PutMapping("/{id}/toggle")
     public ResponseEntity<ApiResponse<FeatureFlagDto>> toggleFeature(
             @PathVariable Long id
@@ -24,7 +33,7 @@ public class FeatureFlagController {
         return ResponseEntity.ok(ApiResponse.success(new FeatureFlagDto(featureFlag)));
     }
 
-    @GetMapping("{id}/is-enable")
+    @GetMapping("{id}/is-enabled")
     public ResponseEntity<ApiResponse<Boolean>> isFeatureEnabled(
             @PathVariable Long id
     ) {

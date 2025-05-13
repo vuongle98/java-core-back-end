@@ -9,4 +9,6 @@ public interface FeatureToggleService {
     boolean isFeatureEnabled(Long id);
 
     FeatureFlag toggleFeature(Long id);
+
+    FeatureFlag getByKey(String key);
 }
