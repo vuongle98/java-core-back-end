@@ -1,7 +1,7 @@
 package com.vuog.core.interfaces.rest;
 
 import com.vuog.core.common.dto.ApiResponse;
-import com.vuog.core.common.util.ObjectMappingUtil;
+import com.vuog.core.common.util.ModelMappingUtil;
 import com.vuog.core.module.auth.application.command.UpdateRoleReq;
 import com.vuog.core.module.auth.application.dto.RoleDto;
 import com.vuog.core.module.auth.application.service.RoleService;
@@ -26,7 +26,7 @@ public class RoleController {
     ) {
         Role role = roleService.update(id, updateRoleReq);
 
-        RoleDto roleDto = ObjectMappingUtil.map(role, RoleDto.class);
+        RoleDto roleDto = ModelMappingUtil.map(role, RoleDto.class);
         return ResponseEntity.ok(ApiResponse.success(roleDto));
     }
 

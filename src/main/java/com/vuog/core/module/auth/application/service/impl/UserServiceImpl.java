@@ -120,7 +120,7 @@ public class UserServiceImpl implements UserService {
         userSetting.setUser(user);
         user.setSettings(userSetting); // If you have a settings field in User
 
-        eventPublisher.publishEvent(new UserCreatedEvent(user));
+        eventPublisher.publishEvent(new UserCreatedEvent(new UserDto(user)));
 
         return userRepository.save(user);
     }
@@ -140,7 +140,7 @@ public class UserServiceImpl implements UserService {
         }
         existedUser.setRoles(roles);
 
-        eventPublisher.publishEvent(new UserUpdatedEvent(existedUser));
+        eventPublisher.publishEvent(new UserUpdatedEvent(new UserDto(existedUser)));
         return userRepository.save(existedUser);
     }
 

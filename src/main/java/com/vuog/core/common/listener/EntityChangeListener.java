@@ -3,6 +3,7 @@ package com.vuog.core.common.listener;
 import com.vuog.core.common.base.BaseModel;
 import com.vuog.core.common.event.AuditLogEvent;
 import com.vuog.core.common.util.Context;
+import com.vuog.core.module.auth.application.dto.UserDto;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
@@ -23,11 +24,11 @@ public class EntityChangeListener {
 
     private static void publishAudit(Object entity, String action) {
         Map<String, Object> auditLog = new HashMap<>();
-        auditLog.put("entity", entity);
+//        auditLog.put("entity", entity);
         auditLog.put("action", action);
         auditLog.put("timestamp", System.currentTimeMillis());
         auditLog.put("entityName", entity.getClass().getSimpleName());
-        auditLog.put("who", Context.getUser());
+        auditLog.put("who", new UserDto(Context.getUser()));
 
         staticPublisher.publishEvent(new AuditLogEvent(auditLog));
     }

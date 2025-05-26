@@ -3,6 +3,7 @@ package com.vuog.core.module.auth.application.service.impl;
 import com.vuog.core.module.auth.domain.repository.EndpointSecureRepository;
 import com.vuog.core.module.auth.application.service.EndpointSecurityService;
 import com.vuog.core.module.auth.domain.model.EndpointSecure;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Service;
@@ -12,15 +13,10 @@ import java.util.List;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class EndpointSecurityServiceImpl implements EndpointSecurityService {
 
-
     private final EndpointSecureRepository endpointSecureRepository;
-
-    public EndpointSecurityServiceImpl(EndpointSecureRepository endpointSecureRepository) {
-        this.endpointSecureRepository = endpointSecureRepository;
-    }
-
 
     @Override
     public void applyDynamicRules(HttpSecurity http) throws Exception {
@@ -30,10 +26,14 @@ public class EndpointSecurityServiceImpl implements EndpointSecurityService {
             for (EndpointSecure rule : rules) {
                 AntPathRequestMatcher matcher = new AntPathRequestMatcher(rule.getEndpointPattern(), rule.getMethod());
 
+                String authority = rule.getAuthority();
+
                 if (rule.getIsRole()) {
-                    auth.requestMatchers(matcher).hasRole(rule.getAuthority());
+                    // In Keycloak, roles are prefixed with "ROLE_" by the Jwt converter
+                    auth.requestMatchers(matcher).hasRole(authority);
                 } else {
-                    auth.requestMatchers(matcher).hasAuthority(rule.getAuthority());
+                    // For custom authorities
+                    auth.requestMatchers(matcher).hasAuthority(authority);
                 }
             }
         });

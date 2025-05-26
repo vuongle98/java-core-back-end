@@ -15,7 +15,6 @@ import java.util.Set;
 @Table(name = "permissions")
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString(exclude = {"roles"})
 @EntityListeners(EntityChangeListener.class)
 public class Permission extends BaseModel {
 
@@ -32,5 +31,6 @@ public class Permission extends BaseModel {
     private String description;
 
     @ManyToMany(mappedBy = "permissions", fetch = FetchType.LAZY)
+    @JsonBackReference
     private Set<Role> roles = new HashSet<>();
 }

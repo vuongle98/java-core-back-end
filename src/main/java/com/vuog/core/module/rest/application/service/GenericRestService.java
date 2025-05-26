@@ -2,7 +2,7 @@ package com.vuog.core.module.rest.application.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vuog.core.common.exception.DataNotFoundException;
-import com.vuog.core.common.util.ObjectMappingUtil;
+import com.vuog.core.common.util.ModelMappingUtil;
 import com.vuog.core.module.rest.domain.repository.GenericRepository;
 import com.vuog.core.module.rest.domain.specification.SpecificationBuilder;
 import com.vuog.core.module.rest.infrastructure.projection.ProjectionHandler;
@@ -123,7 +123,7 @@ public class GenericRestService {
     @SuppressWarnings("unchecked")
     public <T, ID, D> D create(GenericRepository<T, ID> repository, Map<String, Object> createReq, Class<D> projectionClass) throws Exception {
         Class<T> entityClass = repository.getEntityClass();
-        T entity = ObjectMappingUtil.map(createReq, entityClass);
+        T entity = ModelMappingUtil.map(createReq, entityClass);
         handleRelationships(entity, createReq, entityClass);
         T savedEntity = save(repository, entity);
 

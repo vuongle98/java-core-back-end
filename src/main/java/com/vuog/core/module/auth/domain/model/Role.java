@@ -19,7 +19,6 @@ import java.util.Set;
 @Builder
 @Entity
 @Table(name = "roles")
-@ToString(exclude = {"permissions", "users"})
 @EntityListeners(EntityChangeListener.class)
 public class Role extends BaseModel {
 
@@ -33,9 +32,20 @@ public class Role extends BaseModel {
     private String description;
 
     @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
+    @JsonBackReference
     private Set<User> users = new HashSet<>();
 
+    @Column(name = "keycloak_id", unique = true)
+    private String keycloakId;
+
+    @Column(name = "realm_id")
+    private String realmId;
+
+    @Column(name = "client_id") // Null for realm roles, populated for client roles
+    private String clientId;
+
     @ManyToMany(fetch = FetchType.EAGER)
+    @JsonManagedReference
     private Set<Permission> permissions = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.EAGER)

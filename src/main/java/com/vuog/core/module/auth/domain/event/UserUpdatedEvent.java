@@ -1,7 +1,10 @@
 package com.vuog.core.module.auth.domain.event;
 
 import com.vuog.core.common.event.DomainEvent;
-import com.vuog.core.module.auth.domain.model.User;
+import com.vuog.core.common.event.EventType;
+import com.vuog.core.common.event.Event;
+import com.vuog.core.common.util.ObjectMappingUtil;
+import com.vuog.core.module.auth.application.dto.UserDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -11,20 +14,21 @@ import lombok.RequiredArgsConstructor;
 @AllArgsConstructor
 public class UserUpdatedEvent implements DomainEvent {
 
-    private User user;
+    private UserDto user;
 
     @Override
     public String key() {
-        return user.getId().toString();
+        return null; // or whatever makes sense
     }
 
     @Override
     public String eventName() {
-        return "event.UserUpdatedEvent";
+        return "user.events";
     }
 
     @Override
     public String toPayload() {
-        return user.toString();
+        Event<UserDto> event = new Event<>(EventType.UPDATE, user);
+        return ObjectMappingUtil.writeAsString(event);
     }
 }

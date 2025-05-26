@@ -33,18 +33,33 @@ public class User extends BaseModel implements UserDetails {
 
     private Boolean locked = false;
 
+    @Column(name = "keycloak_id", unique = true)
+    private String keycloakId;
+
+    @Column(name = "realm_id")
+    private String realmId;
+
     @ManyToMany(fetch = FetchType.EAGER)
+    @JsonManagedReference
     private Set<Role> roles = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    private Set<Group> groups = new HashSet<>();
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<Token> tokens = new ArrayList<>();
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonManagedReference
     private UserProfile profile;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonManagedReference
     private UserSetting settings;
+
+    @Column(name = "is_verified_email")
+    private Boolean iseVerifiedEmail;
 
     public User(String username) {
         this.username = username;

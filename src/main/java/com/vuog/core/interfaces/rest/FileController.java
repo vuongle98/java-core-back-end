@@ -1,7 +1,7 @@
 package com.vuog.core.interfaces.rest;
 
 import com.vuog.core.common.dto.ApiResponse;
-import com.vuog.core.common.util.ObjectMappingUtil;
+import com.vuog.core.common.util.ModelMappingUtil;
 import com.vuog.core.module.storage.application.dto.FileDownloadDto;
 import com.vuog.core.module.storage.application.dto.FileDto;
 import com.vuog.core.module.storage.application.service.FileService;
@@ -31,7 +31,7 @@ public class FileController {
 
         File fileInfo = fileService.uploadFile(file);
 
-        FileDto fileDto = ObjectMappingUtil.map(fileInfo, FileDto.class);
+        FileDto fileDto = ModelMappingUtil.map(fileInfo, FileDto.class);
         return ResponseEntity.ok(ApiResponse.success(fileDto));
     }
 
@@ -43,7 +43,7 @@ public class FileController {
 
         File fileInfo = fileService.updateFile(id, file);
 
-        FileDto fileDto = ObjectMappingUtil.map(fileInfo, FileDto.class);
+        FileDto fileDto = ModelMappingUtil.map(fileInfo, FileDto.class);
         return ResponseEntity.ok(ApiResponse.success(fileDto));
     }
 

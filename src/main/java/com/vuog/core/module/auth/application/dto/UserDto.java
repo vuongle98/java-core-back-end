@@ -8,6 +8,7 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -35,6 +36,9 @@ public class UserDto extends BaseDto implements Serializable {
         this.permissions = user.getRoles().stream().flatMap(role -> role.getPermissions().stream().map(PermissionDto::new)).collect(Collectors.toSet());
         this.createdAt = user.getCreatedAt();
         this.updatedAt = user.getUpdatedAt();
+//        if (Objects.nonNull(user.getProfile())) {
+//            this.profile = new UserProfileDto(user.getProfile());
+//        }
     }
 
     public UserDto(String username) {

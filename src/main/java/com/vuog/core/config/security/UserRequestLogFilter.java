@@ -57,6 +57,7 @@ public class UserRequestLogFilter extends OncePerRequestFilter {
         if (auth != null && auth.isAuthenticated()) {
             String username = auth.getName();
             User user = userRepository.findByUsername(username).orElseGet(() -> new User(username));
+            System.out.println(user.getProfile().getId());
             userRequestLog.setUser(new UserDto(user));
         } else {
             userRequestLog.setUser(new UserDto("ANONYMOUS"));

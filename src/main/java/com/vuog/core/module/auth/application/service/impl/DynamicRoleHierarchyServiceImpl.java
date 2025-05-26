@@ -34,23 +34,22 @@ public class DynamicRoleHierarchyServiceImpl implements DynamicRoleHierarchyServ
 
         // Build hierarchy from parent-child relationships between roles
         for (Role role : roles) {
+            String roleCode = role.getCode();
+
             if (!MASTER_ADMIN_ROLE.equals(role.getCode())) {
                 // Add hierarchy between parent and child roles
                 for (Role childRole : role.getChildRoles()) {
-                    hierarchyLines.add(role.getCode() + " > " + childRole.getCode());
+                    hierarchyLines.add(roleCode + " > " + childRole.getCode());
                 }
                 
                 // Add hierarchy between role and its permissions
                 for (Permission permission : role.getPermissions()) {
-                    hierarchyLines.add(role.getCode() + " > " + permission.getCode());
+                    hierarchyLines.add(roleCode + " > " + permission.getCode());
                 }
+
+                hierarchyLines.add(MASTER_ADMIN_ROLE + " > " + roleCode);
             }
-
-//            hierarchyLines.add(MASTER_ADMIN_ROLE + " > " + role.getCode());
         }
-
-        // Add ROLE_SUPER_ADMIN as top-level role with access to all permissions
-        hierarchyLines.add(MASTER_ADMIN_ROLE + " > *");
 
         String hierarchyString = String.join("\n", hierarchyLines);
         return RoleHierarchyImpl.fromHierarchy(hierarchyString);
