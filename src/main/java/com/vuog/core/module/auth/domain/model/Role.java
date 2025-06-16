@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.vuog.core.common.base.BaseModel;
-import com.vuog.core.common.listener.EntityChangeListener;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,7 +18,6 @@ import java.util.Set;
 @Builder
 @Entity
 @Table(name = "roles")
-@EntityListeners(EntityChangeListener.class)
 public class Role extends BaseModel {
 
     @Column(name = "name")

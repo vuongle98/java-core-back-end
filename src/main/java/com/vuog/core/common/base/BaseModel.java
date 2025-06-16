@@ -1,5 +1,6 @@
 package com.vuog.core.common.base;
 
+import com.vuog.core.module.stream.infrastructure.listener.JpaEntityChangeListener;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,6 +13,7 @@ import java.time.Instant;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@EntityListeners(JpaEntityChangeListener.class)
 public abstract class BaseModel implements Serializable {
 
     @Id

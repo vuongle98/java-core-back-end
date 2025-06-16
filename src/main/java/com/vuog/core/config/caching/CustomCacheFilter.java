@@ -1,6 +1,9 @@
 package com.vuog.core.config.caching;
 
+import com.vuog.core.config.caching.event.CacheInvalidationEvent;
 import com.vuog.core.module.configuration.infrastructure.service.RedisCacheService;
+import com.vuog.core.module.stream.application.event.StreamPublisher;
+import com.vuog.core.module.stream.application.service.LoggingService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebFilter;
@@ -8,6 +11,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
@@ -28,12 +37,17 @@ public class CustomCacheFilter extends OncePerRequestFilter {
     private static final Logger logger = LoggerFactory.getLogger(CustomCacheFilter.class);
     private final CacheManager cacheManager;
     private final RedisCacheService redisCacheService;
+    private final StreamPublisher streamPublisher;
+    private final LoggingService loggingService;
     @Value("${app.cache-manager-name}")
     private String cacheManagerName;
 
-    public CustomCacheFilter(CacheManager cacheManager, RedisCacheService redisCacheService) {
+    public CustomCacheFilter(CacheManager cacheManager, RedisCacheService redisCacheService,
+                             StreamPublisher streamPublisher, LoggingService loggingService) {
         this.cacheManager = cacheManager;
         this.redisCacheService = redisCacheService;
+        this.streamPublisher = streamPublisher;
+        this.loggingService = loggingService;
     }
 
     @Override
@@ -55,9 +69,39 @@ public class CustomCacheFilter extends OncePerRequestFilter {
             String entityKey = extractEntityKey(request);
 
             if (cache != null) {
-
                 // Get all related cache keys for the entity from Redis
                 Set<String> relatedCacheKeys = redisCacheService.getCacheKeysForEntity(entityKey);
+
+                if (!relatedCacheKeys.isEmpty()) {
+                    // Get current user if authenticated
+                    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                    String username = auth != null && auth.isAuthenticated() ? auth.getName() : "anonymous";
+                    String userId = null;
+
+                    // Create cache invalidation event
+                    CacheInvalidationEvent event = CacheInvalidationEvent.builder()
+                            .entityKey(entityKey)
+                            .cacheKeys(new ArrayList<>(relatedCacheKeys))
+                            .requestUri(request.getRequestURI())
+                            .requestMethod(request.getMethod())
+                            .username(username)
+                            .userId(userId)
+                            .timestamp(System.currentTimeMillis())
+                            .build();
+
+                    // Publish to Kafka
+                    streamPublisher.publish(entityKey, event);
+
+                    // Log cache invalidation
+                    Map<String, Object> metadata = new HashMap<>();
+                    metadata.put("entityKey", entityKey);
+                    metadata.put("cacheKeysCount", relatedCacheKeys.size());
+                    metadata.put("method", request.getMethod());
+                    metadata.put("uri", request.getRequestURI());
+                    loggingService.info("Cache invalidation for entity: " + entityKey, "cache", metadata);
+                }
+
+                // Invalidate all related cache keys
                 for (String key : relatedCacheKeys) {
                     cache.evict(key);
                     redisCacheService.removeCacheKeyFromEntity(entityKey, key);

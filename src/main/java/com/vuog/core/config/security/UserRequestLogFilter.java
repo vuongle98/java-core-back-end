@@ -2,15 +2,14 @@ package com.vuog.core.config.security;
 
 
 import com.vuog.core.common.dto.UserRequestLog;
-import com.vuog.core.common.event.UserRequestLogEvent;
 import com.vuog.core.module.auth.application.dto.UserDto;
 import com.vuog.core.module.auth.domain.model.User;
 import com.vuog.core.module.auth.domain.repository.UserRepository;
+import com.vuog.core.module.stream.application.service.LoggingService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -19,16 +18,18 @@ import org.springframework.web.util.ContentCachingRequestWrapper;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class UserRequestLogFilter extends OncePerRequestFilter {
 
     private final UserRepository userRepository;
-    private final ApplicationEventPublisher applicationEventPublisher;
+    private final LoggingService loggingService;
 
-    public UserRequestLogFilter(UserRepository userRepository, ApplicationEventPublisher applicationEventPublisher) {
+    public UserRequestLogFilter(UserRepository userRepository, LoggingService loggingService) {
         this.userRepository = userRepository;
-        this.applicationEventPublisher = applicationEventPublisher;
+        this.loggingService = loggingService;
     }
 
     @Override
@@ -54,15 +55,35 @@ public class UserRequestLogFilter extends OncePerRequestFilter {
 
         userRequestLog.setPayload(body);
 
+        // Log the request using the stream module
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put("method", method);
+        metadata.put("uri", uri);
+        metadata.put("ipAddress", userIp);
+        metadata.put("queryString", request.getQueryString());
+        metadata.put("responseStatus", response.getStatus());
+
+        // Truncate body if too large
+        if (body != null && body.length() > 1000) {
+            metadata.put("payload", body.substring(0, 997) + "...");
+        } else {
+            metadata.put("payload", body);
+        }
+
         if (auth != null && auth.isAuthenticated()) {
             String username = auth.getName();
             User user = userRepository.findByUsername(username).orElseGet(() -> new User(username));
-            System.out.println(user.getProfile().getId());
             userRequestLog.setUser(new UserDto(user));
+            metadata.put("username", username);
+
+            // Log the request with user information
+            loggingService.info("User request: " + method + " " + uri, "access-log", metadata);
         } else {
             userRequestLog.setUser(new UserDto("ANONYMOUS"));
-        }
+            metadata.put("username", "ANONYMOUS");
 
-        applicationEventPublisher.publishEvent(new UserRequestLogEvent(userRequestLog));
+            // Log anonymous request
+            loggingService.info("Anonymous request: " + method + " " + uri, "access-log", metadata);
+        }
     }
 }

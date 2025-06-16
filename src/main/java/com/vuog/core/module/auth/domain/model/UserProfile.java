@@ -2,7 +2,6 @@ package com.vuog.core.module.auth.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.vuog.core.common.base.BaseModel;
-import com.vuog.core.common.listener.EntityChangeListener;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,7 +12,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-@EntityListeners(EntityChangeListener.class)
 public class UserProfile extends BaseModel {
 
     @OneToOne(mappedBy = "profile", cascade = CascadeType.ALL)

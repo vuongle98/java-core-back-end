@@ -3,7 +3,6 @@ package com.vuog.core.module.auth.domain.model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.vuog.core.common.base.BaseModel;
-import com.vuog.core.common.listener.EntityChangeListener;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -15,7 +14,6 @@ import java.time.Instant;
 @AllArgsConstructor
 @Entity
 @Table(name = "tokens")
-@EntityListeners(EntityChangeListener.class)
 @ToString(exclude = {"relatedToken"})
 public class Token extends BaseModel {
 

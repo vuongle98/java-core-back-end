@@ -10,8 +10,6 @@ import com.vuog.core.module.auth.application.dto.UserProfileDto;
 import com.vuog.core.module.auth.application.query.UserQuery;
 import com.vuog.core.module.auth.application.service.UserService;
 import com.vuog.core.module.auth.application.specification.UserSpecification;
-import com.vuog.core.module.auth.domain.event.UserCreatedEvent;
-import com.vuog.core.module.auth.domain.event.UserUpdatedEvent;
 import com.vuog.core.module.auth.domain.model.Role;
 import com.vuog.core.module.auth.domain.model.User;
 import com.vuog.core.module.auth.domain.model.UserProfile;
@@ -120,8 +118,6 @@ public class UserServiceImpl implements UserService {
         userSetting.setUser(user);
         user.setSettings(userSetting); // If you have a settings field in User
 
-        eventPublisher.publishEvent(new UserCreatedEvent(new UserDto(user)));
-
         return userRepository.save(user);
     }
 
@@ -140,7 +136,6 @@ public class UserServiceImpl implements UserService {
         }
         existedUser.setRoles(roles);
 
-        eventPublisher.publishEvent(new UserUpdatedEvent(new UserDto(existedUser)));
         return userRepository.save(existedUser);
     }
 

@@ -1,9 +1,7 @@
 package com.vuog.core.module.auth.domain.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.vuog.core.common.base.BaseModel;
-import com.vuog.core.common.listener.EntityChangeListener;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -19,7 +17,6 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Entity
 @Table(name = "users")
-@EntityListeners(EntityChangeListener.class)
 public class User extends BaseModel implements UserDetails {
 
     @Column(name = "username")
