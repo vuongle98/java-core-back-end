@@ -181,14 +181,6 @@ Handles event streaming and logging using Kafka. See [STREAM-MODULE.md](README-S
 
 ## 🛠 Development
 
-### Code Style
-
-This project uses Google Java Style Guide. Before committing, run:
-
-```bash
-./gradlew spotlessApply
-```
-
 ### Testing
 
 Run all tests:
@@ -220,13 +212,6 @@ This project uses Flyway for database migrations. Place your SQL scripts in `src
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-- `src/main/java/com/vuog/core`: Main application code.
-- `src/test/java/com/vuog/core`: Test cases.
-- `src/main/resources`: Configuration files and static resources.
 
 ### Adding a New Module
 
@@ -248,11 +233,3 @@ Contributions are welcome! Please follow the standard GitHub workflow:
 2. Create a feature branch.
 3. Commit your changes.
 4. Submit a pull request.
-
-## License
-
-This project is licensed under the MIT License. See the `LICENSE` file for details.
-
-## Contact
-
-For questions or support, please contact [your-email@example.com].
