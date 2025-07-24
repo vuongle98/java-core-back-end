@@ -1,8 +1,6 @@
 package com.vuog.core.config;
 
-import com.vuog.core.config.security.CustomAuthorizationManager;
-import com.vuog.core.config.security.CustomPermissionEvaluator;
-import com.vuog.core.config.security.KeycloakRealmRoleConverter;
+import com.vuog.core.config.security.*;
 import com.vuog.core.module.auth.application.service.DynamicRoleHierarchyService;
 import com.vuog.core.module.auth.application.service.EndpointSecurityService;
 import jakarta.servlet.Filter;
@@ -19,6 +17,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -34,14 +33,14 @@ import java.util.List;
 public class SecurityConfig {
 
     private final DynamicRoleHierarchyService dynamicRoleHierarchyService;
-    private final EndpointSecurityService endpointSecurityService;
     private final CustomAuthorizationManager customAuthorizationManager;
-    private final Filter rateLimitingFilter;
-    private final Filter userRequestLogFilter;
+    private final RateLimitingFilter rateLimitingFilter;
+    private final UserRequestLogFilter userRequestLogFilter;
+    private final DynamicRuleFilter dynamicRuleFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        endpointSecurityService.applyDynamicRules(http);
+//        endpointSecurityService.applyDynamicRules(http);
 
         http.csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
@@ -65,8 +64,9 @@ public class SecurityConfig {
                 )
                 .httpBasic(Customizer.withDefaults());
 
+        http.addFilterBefore(userRequestLogFilter, UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(rateLimitingFilter, UsernamePasswordAuthenticationFilter.class);
-        http.addFilterAfter(userRequestLogFilter, rateLimitingFilter.getClass());
+        http.addFilterAfter(dynamicRuleFilter, BearerTokenAuthenticationFilter.class);
 
         return http.build();
     }

@@ -1,10 +1,12 @@
 package com.vuog.core.common.util;
 
+import com.vuog.core.common.base.BaseModel;
 import com.vuog.core.common.exception.UserNotFoundException;
 import com.vuog.core.module.auth.domain.model.User;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.util.Objects;
 
@@ -48,5 +50,23 @@ public class Context {
     public static void clear() {
         currentUser.remove();
         SecurityContextHolder.clearContext();
+    }
+
+    public static String getCurrentUserId() {
+        Jwt jwt = (Jwt) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+        return jwt.getSubject(); // sub is Keycloak userId
+    }
+
+    public static String getCurrentUsername() {
+        Jwt jwt = (Jwt) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+        return jwt.getClaimAsString("preferred_username");
+    }
+
+    public static boolean hasRole(String role) {
+        return SecurityContextHolder.getContext().getAuthentication()
+                .getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals(role));
     }
 }

@@ -1,7 +1,7 @@
 package com.vuog.core.config.caching;
 
 import com.vuog.core.config.caching.event.CacheInvalidationEvent;
-import com.vuog.core.module.configuration.infrastructure.service.RedisCacheService;
+import com.vuog.core.common.service.RedisCacheService;
 import com.vuog.core.module.stream.application.event.StreamPublisher;
 import com.vuog.core.module.stream.application.service.LoggingService;
 import jakarta.servlet.FilterChain;

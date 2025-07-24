@@ -135,60 +135,6 @@ public class DatabaseSeeder {
     }
 
     @Bean
-    CommandLineRunner initEndpointSecurity(
-            EndpointSecureRepository endpointSecureRepository
-    ) {
-        return args -> {
-
-            Context.setSystemUser();
-
-            Set<String> entities = scanEntities("com.vuog.core.module");
-
-            for (String entity : entities) {
-
-                entity = entity.substring(0, 1).toLowerCase() + entity.substring(1);
-                String withoutId = "/api/" + entity;
-                String withId = withoutId + "/{id}";
-                String readPerm = "READ_" + entity.toUpperCase();
-                String writePerm = "WRITE_" + entity.toUpperCase();
-
-                if (endpointSecureRepository.findByEndpointPatternAndMethod(withoutId, "GET").isEmpty()) {
-                    EndpointSecure getAllEndpoint = new EndpointSecure(withoutId, "GET", readPerm, false);
-                    endpointSecureRepository.save(getAllEndpoint);
-                }
-
-                if (endpointSecureRepository.findByEndpointPatternAndMethod(withId, "GET").isEmpty()) {
-                    EndpointSecure getDetailEndpoint = new EndpointSecure(withId, "GET", readPerm, false);
-                    endpointSecureRepository.save(getDetailEndpoint);
-                }
-
-                if (endpointSecureRepository.findByEndpointPatternAndMethod(withId, "PUT").isEmpty()) {
-                    EndpointSecure updateEndpoint = new EndpointSecure(withId, "PUT", writePerm, false);
-                    endpointSecureRepository.save(updateEndpoint);
-                }
-
-                if (endpointSecureRepository.findByEndpointPatternAndMethod(withoutId, "POST").isEmpty()) {
-                    EndpointSecure createAllEndpoint = new EndpointSecure(withoutId, "POST", writePerm, false);
-                    endpointSecureRepository.save(createAllEndpoint);
-                }
-
-                if (endpointSecureRepository.findByEndpointPatternAndMethod(withId, "DELETE").isEmpty()) {
-                    EndpointSecure deleteEndpoint = new EndpointSecure(withId, "DELETE", writePerm, false);
-                    endpointSecureRepository.save(deleteEndpoint);
-                }
-            }
-
-            if (endpointSecureRepository.findByEndpointPatternAndMethod("/api/**", "GET").isEmpty()) {
-                EndpointSecure superRoleEndpoint = new EndpointSecure("/api/**", "GET", "SUPER_ADMIN", true);
-                endpointSecureRepository.save(superRoleEndpoint);
-            }
-
-            logger.info("Added endpoint secures");
-            Context.clear();
-        };
-    }
-
-    @Bean
     CommandLineRunner initFeature(FeatureFlagRepository featureFlagRepository) {
 
         return args -> {

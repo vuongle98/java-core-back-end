@@ -1,5 +1,6 @@
 package com.vuog.core.interfaces.rest;
 
+import com.vuog.core.common.annotations.CanAccess;
 import com.vuog.core.common.dto.ApiResponse;
 import com.vuog.core.common.validation.RequestValidator;
 import com.vuog.core.module.auth.application.command.CreateUserReq;
@@ -33,6 +34,7 @@ public class UserController {
     }
 
     @GetMapping
+    @CanAccess(role = "READ_USER")
     public ResponseEntity<ApiResponse<Page<UserDto>>> getAll(
             UserQuery query,
             Pageable pageable

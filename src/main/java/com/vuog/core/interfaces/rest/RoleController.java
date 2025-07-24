@@ -7,6 +7,7 @@ import com.vuog.core.module.auth.application.dto.RoleDto;
 import com.vuog.core.module.auth.application.service.RoleService;
 import com.vuog.core.module.auth.domain.model.Role;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

@@ -61,6 +61,6 @@ public class JpaEntityChangeListener {
         if (authentication != null && authentication.isAuthenticated()) {
             return authentication.getName();
         }
-        return "system";
+        return "SYSTEM";
     }
 }

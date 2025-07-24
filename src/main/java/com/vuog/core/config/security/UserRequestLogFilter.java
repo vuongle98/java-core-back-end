@@ -64,7 +64,7 @@ public class UserRequestLogFilter extends OncePerRequestFilter {
         metadata.put("responseStatus", response.getStatus());
 
         // Truncate body if too large
-        if (body != null && body.length() > 1000) {
+        if (body.length() > 1000) {
             metadata.put("payload", body.substring(0, 997) + "...");
         } else {
             metadata.put("payload", body);

@@ -23,6 +23,7 @@ public class JacksonConfig {
         // SERIALIZE_IDENTIFIER_FOR_LAZY_NOT_LOADED_OBJECTS: Only serializes the ID for non-loaded objects
         hibernateModule.configure(Hibernate5JakartaModule.Feature.SERIALIZE_IDENTIFIER_FOR_LAZY_NOT_LOADED_OBJECTS, true);
         objectMapper.registerModule(hibernateModule);
+        objectMapper.registerModule(new JavaTimeModule());
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
         return objectMapper;

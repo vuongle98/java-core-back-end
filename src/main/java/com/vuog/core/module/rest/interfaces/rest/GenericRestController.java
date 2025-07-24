@@ -1,5 +1,6 @@
 package com.vuog.core.module.rest.interfaces.rest;
 
+import com.vuog.core.common.annotations.CanAccess;
 import com.vuog.core.common.dto.ApiRequest;
 import com.vuog.core.common.dto.ApiResponse;
 import com.vuog.core.common.exception.DataNotFoundException;
@@ -32,6 +33,7 @@ public class GenericRestController<T, ID> {
     }
 
     @GetMapping
+    @CanAccess(role = "READ_{ENTITY}")
     @SuppressWarnings("unchecked")
     public <D> ResponseEntity<ApiResponse<Page<D>>> getAll(
             @PathVariable("entity") String entity,
@@ -84,6 +86,7 @@ public class GenericRestController<T, ID> {
     }
 
     @GetMapping("/{id}")
+    @CanAccess(role = "READ_{ENTITY}")
     @SuppressWarnings("unchecked")
     public <D> ResponseEntity<ApiResponse<D>> getById(
             @PathVariable("entity") String entity,
@@ -115,6 +118,7 @@ public class GenericRestController<T, ID> {
     }
 
     @PostMapping
+    @CanAccess(role = "WRITE_{ENTITY}")
     public <D> ResponseEntity<ApiResponse<D>> create(
             @PathVariable("entity") String entityName,
             @RequestBody Map<String, Object> createReq,
@@ -140,6 +144,7 @@ public class GenericRestController<T, ID> {
     }
 
     @PutMapping("/{id}")
+    @CanAccess(role = "WRITE_{ENTITY}")
     public <D> ResponseEntity<ApiResponse<D>> update(
             @PathVariable("entity") String entity,
             @PathVariable ID id,
@@ -169,6 +174,7 @@ public class GenericRestController<T, ID> {
     }
 
     @DeleteMapping("/{id}")
+    @CanAccess(role = "DELETE_{ENTITY}")
     public ResponseEntity<ApiResponse<Void>> delete(
             @PathVariable("entity") String entity,
             @PathVariable ID id) {
@@ -192,6 +198,7 @@ public class GenericRestController<T, ID> {
     }
 
     @GetMapping("/search")
+    @CanAccess(role = "SEARCH_{ENTITY}")
     @SuppressWarnings("unchecked")
     public <D> ResponseEntity<ApiResponse<Page<D>>> searchWithFilters(
             @PathVariable("entity") String entity,

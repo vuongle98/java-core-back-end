@@ -1,6 +1,6 @@
 package com.vuog.core.interfaces.rest;
 
-import com.vuog.core.module.configuration.infrastructure.service.RedisCacheService;
+import com.vuog.core.common.service.RedisCacheService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 

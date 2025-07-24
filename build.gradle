@@ -41,6 +41,7 @@ dependencies {
 
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate5-jakarta'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8'
 
 	implementation 'org.modelmapper:modelmapper:3.2.0'
 	implementation 'org.reflections:reflections:0.10.2'
